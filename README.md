@@ -1,6 +1,6 @@
 # Benchmarking LLMs Pipeline
 
-This repository contains a pipeline for benchmarking Large Language Models (LLMs) introduced in: 
+This repository contains a pipeline for benchmarking Large Language Models (LLMs) at cell type annotation introduced in: 
 > #### Benchmarking Cell Type Annotation by Large Language Models with AnnDictionary  
 > **George Crowley, Tabula Sapiens Consortium, Stephen R. Quake**  
 > *bioRxiv* 2024.10.10.617605  
