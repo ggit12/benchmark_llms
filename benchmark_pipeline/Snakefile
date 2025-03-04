@@ -17,7 +17,7 @@ sys.path.append(source_dir)
 
 from src import PROVIDERS, ENDPOINTS
 
-rule all: # pylint: disable=syntax-error
+rule all:
     input:
         'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
 
@@ -25,7 +25,7 @@ rule o1_preprocess_ts2:
     input:
         os.environ["INPUT_DATA"]
     output:
-        directory(os.environ["PROCESSED_DATA"])
+        directory("res/preprocessed_tissue_adt_ts2")
     resources:
         partition="cpu",
         mem_gb=800,
@@ -40,7 +40,7 @@ rule o1_preprocess_ts2:
 
 rule o2_run_openai:
     input:
-        os.environ["PROCESSED_DATA"]
+        "res/preprocessed_tissue_adt_ts2"
     output:
         expand("res/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
@@ -63,7 +63,6 @@ rule o2_run_openai:
 #Here will go the rules for the other providers
 
 ##End other provider rules section
-
 
 # Aggregate the results
 rule o3_aggregate_results:
@@ -126,7 +125,7 @@ rule o5_figure_s1:
         'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
         'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
     output:
-        "res/05_figure_s1/done" # Uses a done file because the specific filen names may change (if the top models are different) and are not used downstream
+        "res/05_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
     resources:
         partition="cpu",
         mem_gb=400,
@@ -147,7 +146,7 @@ rule o6_figure_3_and_s2:
     output:
         "res/06_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
         "res/06_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
-        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific filen names may change (if the top models are different) and are not used downstream
+        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         "res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
         # These files won't run unless on the bigger object
         # "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",

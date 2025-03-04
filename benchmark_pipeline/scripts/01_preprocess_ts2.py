@@ -71,4 +71,4 @@ adt.wrappers.leiden_adata_dict(adata_dict, resolution=0.5)
 adt.wrappers.rank_genes_groups_adata_dict(adata_dict, groupby='leiden')
 
 # Write the preprocessed AdataDict
-adt.write_adata_dict(adata_dict, os.environ["PROCESSED_DATA"])
+adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
