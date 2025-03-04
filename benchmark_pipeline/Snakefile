@@ -149,14 +149,14 @@ rule o6_figure_3_and_s2:
         "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         "res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
         # These files won't run unless on the bigger object
-        # "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
-        # "res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
-        # "res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
-        # "res/06_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
-        # "res/06_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
-        # "res/06_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
-        # "res/06_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
-        # "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+        "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
+        "res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
+        "res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
+        "res/06_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
+        "res/06_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
+        "res/06_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
+        "res/06_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
+        "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
     resources:
         partition="cpu",
         mem_gb=400,
@@ -201,10 +201,10 @@ rule o8_figure_5:
         'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
         # 'res/08_figure_5/sankey_topleft_of_agreement.svg',
         # These files won't run unless on the bigger object
-        # 'res/08_figure_5/gene_module_scores_in_phagocytes.svg',
-        # 'res/08_figure_5/macrophage_module_umap_in_phagocytes.svg',
-        # 'res/08_figure_5/monocyte_module_umap_in_phagocytes.svg',
-        # 'res/08_figure_5/dendritic_module_umap_in_phagocytes.svg',
+        'res/08_figure_5/gene_module_scores_in_phagocytes.svg',
+        'res/08_figure_5/macrophage_module_umap_in_phagocytes.svg',
+        'res/08_figure_5/monocyte_module_umap_in_phagocytes.svg',
+        'res/08_figure_5/dendritic_module_umap_in_phagocytes.svg',
     resources:
         partition="cpu",
         mem_gb=400,
