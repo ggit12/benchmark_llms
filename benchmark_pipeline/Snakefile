@@ -1,0 +1,154 @@
+"""
+Snakefile for benchmark_pipeline. Limits concurrent models per provider to 1.
+
+To add a new model for an existing provider, just add it to ENDPOINTS in providers.py.
+"""
+# pylint: disable=syntax-error
+
+import os
+import sys
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+source_dir = os.environ["SOURCE_DIR"]
+sys.path.append(source_dir)
+
+from src import PROVIDERS, ENDPOINTS
+
+rule all: # pylint: disable=syntax-error
+    input:
+        'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
+
+rule o1_preprocess_ts2:
+    input:
+        os.environ["INPUT_DATA"]
+    output:
+        directory(os.environ["PROCESSED_DATA"])
+    shell:
+        "which python; python scripts/01_preprocess_ts2.py"
+
+
+rule o2_run_openai:
+    input:
+        os.environ["PROCESSED_DATA"]
+    output:
+        expand("res/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
+    params:
+        provider="openai",
+        outdir="res/02_run_provider"
+    shell:
+        "python scripts/02_run_provider.py \
+        --provider {params.provider} \
+        --input {input} \
+        --outdir {params.outdir}"
+
+#Here will go the rules for the other providers
+
+##End other provider rules section
+
+
+# Aggregate the results
+rule o3_aggregate_results:
+    input:
+        # [f"res/02_run_provider/{provider}_{model}.pkl" 
+        #         for provider, models in ENDPOINTS.endpoints.items()
+        #         for model in models]
+        [f"res/02_run_provider/openai_{model}.pkl" for model in ENDPOINTS.endpoints["openai"]]
+    output:
+        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
+        'res/03_gather_outputs/label_map_with_manual.pkl',
+        'res/03_gather_outputs/label_agreement_binary.pkl',
+        'res/03_gather_outputs/label_agreement_categorical.pkl',
+        'res/03_gather_outputs/manual_cell_type_col.pkl',
+        'res/03_gather_outputs/llm_celltype_cols.pkl',
+        'res/03_gather_outputs/binary_agreement_cols.pkl',
+        'res/03_gather_outputs/categorical_agreement_cols.pkl',
+        'res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl',
+    shell:
+        "python scripts/03_aggregate_results.py"
+
+rule o4_figure_2_and_table_2:
+    input:
+        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad'
+    output:
+        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_binary.svg',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
+        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+        'res/04_figure_2_and_table_2/kappa_clustermap_overall.svg',
+        'res/04_figure_2_and_table_2/average_pairwise_kappa.svg',
+        'res/04_figure_2_and_table_2/performance_table.html',
+    shell:
+        "python scripts/04_figure_2_and_table_2.py"
+
+rule o5_figure_s1:
+    input:
+        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
+        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+    output:
+        "res/05_figure_s1/done" # Uses a done file because the specific filen names may change (if the top models are different) and are not used downstream
+    shell:
+        "python scripts/05_figure_s1.py"
+
+rule o6_figure_3_and_s2:
+    input:
+        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
+        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+        'res/04_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+    output:
+        "res/06_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
+        "res/06_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
+        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific filen names may change (if the top models are different) and are not used downstream
+        "res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
+        # These files won't run unless on the bigger object
+        # "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
+        # "res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
+        # "res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
+        # "res/06_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
+        # "res/06_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
+        # "res/06_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
+        # "res/06_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
+        # "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+    shell:
+        "python scripts/06_figure_3_and_s2.py"
+
+rule o7_figure_4:
+    input:
+        "res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad",
+        "res/03_gather_outputs/manual_cell_type_col.pkl",
+        "res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
+        "res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
+        "res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
+        "res/03_gather_outputs/llm_celltype_cols.pkl",
+    output:
+        'res/07_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
+        'res/07_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
+        'res/07_figure_4/agreement_df.pkl',
+        'res/07_figure_4/agreement_weights_df.pkl',
+    shell:
+        "python scripts/07_figure_4.py"
+
+rule o8_figure_5:
+    input:
+        "res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad",
+        'res/07_figure_4/agreement_df.pkl',
+        'res/07_figure_4/agreement_weights_df.pkl',
+    output:
+        'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
+        # 'res/08_figure_5/sankey_topleft_of_agreement.svg',
+        # These files won't run unless on the bigger object
+        # 'res/08_figure_5/gene_module_scores_in_phagocytes.svg',
+        # 'res/08_figure_5/macrophage_module_umap_in_phagocytes.svg',
+        # 'res/08_figure_5/monocyte_module_umap_in_phagocytes.svg',
+        # 'res/08_figure_5/dendritic_module_umap_in_phagocytes.svg',
+    shell:
+        "python scripts/08_figure_5.py"
