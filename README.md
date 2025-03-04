@@ -36,6 +36,7 @@ conda install -c conda-forge tbb numba
 pip install anndict
 pip install snakemake
 pip install selenium
+pip install dotenv
 ```
 
 ## Pipeline Execution
