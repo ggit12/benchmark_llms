@@ -42,7 +42,7 @@ rule o2_run_openai:
     input:
         "res/preprocessed_tissue_adt_ts2"
     output:
-        expand("res/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
+        expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
         partition="cpu",
         mem_gb=500,
