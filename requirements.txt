@@ -1,0 +1,5 @@
+anndict
+snakemake
+selenium
+python-dotenv
+adjustText

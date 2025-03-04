@@ -21,8 +21,12 @@ This repository contains a pipeline for benchmarking Large Language Models (LLMs
 ## Setup
 
 1. Clone the repository
+```bash
+git clone https://github.com/ggit12/benchmark_llms.git
+```
 2. Create a local `.env` file by copying the template:
 ```bash
+cd benchmark_llms
 cp benchmark_pipeline/.env_template benchmark_pipeline/.env
 ```
 3. Edit your `.env` file in `benchmark_pipeline/` as needed, including:
@@ -33,10 +37,7 @@ cp benchmark_pipeline/.env_template benchmark_pipeline/.env
 conda create -n benchmark_llms python=3.12
 conda activate benchmark_llms
 conda install -c conda-forge tbb numba
-pip install anndict
-pip install snakemake
-pip install selenium
-pip install dotenv
+pip install -r requirements.txt
 ```
 
 ## Pipeline Execution
