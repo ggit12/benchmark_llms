@@ -15,7 +15,7 @@ This repository contains a pipeline for benchmarking Large Language Models (LLMs
 - `benchmark_pipeline/`: Main pipeline directory
     - `Snakefile`: Defines the pipeline workflow and dependencies
     - `.env`: Configuration file for paths and API keys (create your own)
-    - `scripts/`: Processing scripts in numerical order
+    - `scripts/`: Processing scripts in labeled in the order that they are run
     - `res/`: Output directory for results and figures
 
 ## Setup
@@ -28,7 +28,7 @@ This repository contains a pipeline for benchmarking Large Language Models (LLMs
 
 ## Pipeline Execution
 
-Files are numbered sequentially to indicate processing order. Input/output relationships are defined in the Snakefile.
+Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
 
 ## Note
 
