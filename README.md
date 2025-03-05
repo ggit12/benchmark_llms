@@ -50,9 +50,7 @@ snakemake --snakefile Snakefile
 
 If you are running on a computing cluster with slurm, you can run the pipeline like this:
 ```bash
-snakemake \
-  --snakefile Snakefile \
-  --profile slurm_profile
+sbatch slurm_run_snakemake.sh
 ```
 
 Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
