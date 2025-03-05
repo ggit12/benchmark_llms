@@ -63,7 +63,7 @@ conda activate benchmark_llms && \
 snakemake --snakefile Snakefile --profile slurm_profile" C-m
 ```
 
-Note that this specific command might require some debugging, depending on your specific system configurations. For example, if conda is nto initialized in your `.bashrc`, this might fail. 
+Note that this specific command might require some debugging, depending on your specific system configurations. For example, if conda is not initialized in your `.bashrc`, this might fail. 
 In this case, you can try manually by following the example below.
 ```bash
 tmux new -s snakemake

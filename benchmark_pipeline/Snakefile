@@ -29,7 +29,7 @@ rule o1_preprocess_ts2:
         partition="cpu", # --partition
         mem="800G", # --mem
         cpus=30, # --cpus-per-task
-        runtime=120, # --time
+        runtime=240, # --time
         tasks=1, # --ntasks
     shell:
         "python scripts/01_preprocess_ts2.py"
