@@ -54,7 +54,13 @@ snakemake --snakefile Snakefile
 
 Or, if you are running on a computing cluster with slurm, you can run the pipeline like this:
 ```bash
-sbatch slurm_run_snakemake.sh
+tmux new -s snakemake
+snakemake --snakefile Snakefile --profile slurm_profile
+```
+
+Then, detach with `Ctrl+B`, `D` and reattach later using:
+```bash
+tmux attach -t snakemake
 ```
 
 Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
