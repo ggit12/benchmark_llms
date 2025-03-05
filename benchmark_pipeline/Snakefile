@@ -56,17 +56,73 @@ rule o2_run_openai:
         --input {input} \
         --outdir {params.outdir}"
 
-#Here will go the rules for the other providers
+rule o2_run_anthropic:
+    input:
+        "res/preprocessed_tissue_adt_ts2"
+    output:
+        expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
+    resources:
+        partition="cpu",
+        mem=500,
+        cpus=30,
+        runtime=480,
+        ntasks=1,
+    params:
+        provider="anthropic",
+        outdir="res/02_run_provider"
+    shell:
+        "python scripts/02_run_provider.py \
+        --provider {params.provider} \
+        --input {input} \
+        --outdir {params.outdir}"
 
-##End other provider rules section
+rule o2_run_bedrock:
+    input:
+        "res/preprocessed_tissue_adt_ts2"
+    output:
+        expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
+    resources:
+        partition="cpu",
+        mem=500,
+        cpus=30,
+        runtime=480,
+        ntasks=1,
+    params:
+        provider="bedrock",
+        outdir="res/02_run_provider"
+    shell:
+        "python scripts/02_run_provider.py \
+        --provider {params.provider} \
+        --input {input} \
+        --outdir {params.outdir}"
+
+rule o2_run_google:
+    input:
+        "res/preprocessed_tissue_adt_ts2"
+    output:
+        expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
+    resources:
+        partition="cpu",
+        mem=500,
+        cpus=30,
+        runtime=480,
+        ntasks=1,
+    params:
+        provider="google",
+        outdir="res/02_run_provider"
+    shell:
+        "python scripts/02_run_provider.py \
+        --provider {params.provider} \
+        --input {input} \
+        --outdir {params.outdir}"
 
 # Aggregate the results
 rule o3_aggregate_results:
     input:
-        # [f"res/02_run_provider/{provider}_{model}.pkl" 
-        #         for provider, models in ENDPOINTS.endpoints.items()
-        #         for model in models]
-        [f"res/02_run_provider/openai_{model}.pkl" for model in ENDPOINTS.endpoints["openai"]]
+        [f"res/02_run_provider/{provider}_{model}.pkl" 
+                for provider, models in ENDPOINTS.endpoints.items()
+                for model in models]
+        # [f"res/02_run_provider/openai_{model}.pkl" for model in ENDPOINTS.endpoints["openai"]]
     output:
         'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
         'res/03_gather_outputs/label_map_with_manual.pkl',
