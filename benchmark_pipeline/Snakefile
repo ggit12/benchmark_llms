@@ -26,14 +26,12 @@ rule o1_preprocess_ts2:
         os.environ["INPUT_DATA"]
     output:
         directory("res/preprocessed_tissue_adt_ts2")
-    resources:
-        partition="cpu",
-        mem_gb=800,
-        cpus=30,
-        time="00-02:00:00",
-        ntasks=1,
-        job_name="01_preprocess_ts2",
-        log="log/01_preprocess_ts2_%j.log",
+    resources: # sbatch flag to which snakemake maps
+        partition="cpu", # --partition
+        mem="800G", # --mem
+        cpus=30, # --cpus-per-task
+        runtime=120, # --time
+        tasks=1, # --ntasks
     shell:
         "python scripts/01_preprocess_ts2.py"
 
@@ -45,12 +43,10 @@ rule o2_run_openai:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
         partition="cpu",
-        mem_gb=500,
+        mem=500,
         cpus=30,
-        time="00-08:00:00",
+        runtime=480,
         ntasks=1,
-        job_name="o2_run_openai",
-        log="log/o2_run_openai_%j.log",
     params:
         provider="openai",
         outdir="res/02_run_provider"
@@ -83,12 +79,10 @@ rule o3_aggregate_results:
         'res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl',
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-05:00:00",
+        runtime=300,
         ntasks=1,
-        job_name="o3_aggregate_results",
-        log="log/o3_aggregate_results_%j.log",
     shell:
         "python scripts/03_aggregate_results.py"
 
@@ -111,12 +105,10 @@ rule o4_figure_2_and_table_2:
         'res/04_figure_2_and_table_2/performance_table.html',
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-05:00:00",
+        runtime=300,
         ntasks=1,
-        job_name="o4_figure_2_and_table_2",
-        log="log/o4_figure_2_and_table_2_%j.log",
     shell:
         "python scripts/04_figure_2_and_table_2.py"
 
@@ -128,12 +120,10 @@ rule o5_figure_s1:
         "res/05_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-01:00:00",
+        runtime=60,
         ntasks=1,
-        job_name="o5_figure_s1",
-        log="log/o5_figure_s1_%j.log",
     shell:
         "python scripts/05_figure_s1.py"
 
@@ -148,7 +138,7 @@ rule o6_figure_3_and_s2:
         "res/06_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
         "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         "res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
-        # These files won't run unless on the bigger object
+        # These files below won't run unless on the bigger object
         "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
         "res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
         "res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
@@ -159,12 +149,10 @@ rule o6_figure_3_and_s2:
         "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-01:00:00",
+        runtime=60,
         ntasks=1,
-        job_name="o6_figure_3_and_s2",
-        log="log/o6_figure_3_and_s2_%j.log",
     shell:
         "python scripts/06_figure_3_and_s2.py"
 
@@ -183,12 +171,10 @@ rule o7_figure_4:
         'res/07_figure_4/agreement_weights_df.pkl',
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-02:00:00",
+        time=120,
         ntasks=1,
-        job_name="o7_figure_4",
-        log="log/o7_figure_4_%j.log",
     shell:
         "python scripts/07_figure_4.py"
 
@@ -200,18 +186,16 @@ rule o8_figure_5:
     output:
         'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
         # 'res/08_figure_5/sankey_topleft_of_agreement.svg',
-        # These files won't run unless on the bigger object
+        # These files below won't run unless on the bigger object
         'res/08_figure_5/gene_module_scores_in_phagocytes.svg',
         'res/08_figure_5/macrophage_module_umap_in_phagocytes.svg',
         'res/08_figure_5/monocyte_module_umap_in_phagocytes.svg',
         'res/08_figure_5/dendritic_module_umap_in_phagocytes.svg',
     resources:
         partition="cpu",
-        mem_gb=400,
+        mem="400G",
         cpus=30,
-        time="00-02:00:00",
+        runtime=60,
         ntasks=1,
-        job_name="o8_figure_5",
-        log="log/o8_figure_5_%j.log",
     shell:
         "python scripts/08_figure_5.py"
