@@ -1,9 +1,3 @@
-cluster: "sbatch --partition={resources.partition} \
-                 --job-name={resources.job_name} \
-                 --mem={resources.mem_gb}G \
-                 --cpus-per-task={resources.cpus} \
-                 --time={resources.time} \
-                 --ntasks={resources.ntasks} \
-                 --output={resources.log}"
+executor: slurm
 jobs: 5
 latency-wait: 60

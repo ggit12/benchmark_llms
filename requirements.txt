@@ -1,5 +1,6 @@
 anndict
 snakemake
+snakemake-executor-plugin-slurm
 selenium
 python-dotenv
 adjustText
