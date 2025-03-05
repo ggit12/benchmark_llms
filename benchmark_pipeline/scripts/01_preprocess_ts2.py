@@ -12,8 +12,16 @@ import scanpy as sc
 #read data
 adata = sc.read_h5ad(os.environ["INPUT_DATA"]) # pylint: disable=line-too-long
 
-#adata.X appears to be raw counts.
-adata.X[1:20].todense()
+#remove extra obsm and layers for memory purposes
+# Delete all the extra data
+for key in ['X_pca', 'X_scvi', 'X_umap', 'X_umap_scvi_full_donorassay', 'X_uncorrected_alltissues_umap', 'X_uncorrected_umap']:
+    del adata.obsm[key]
+
+for key in ['decontXcounts', 'log_normalized', 'scale_data']:
+    del adata.layers[key]
+
+#set X to be raw_counts
+adata.X = adata.layers['raw_counts'].copy()
 
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
