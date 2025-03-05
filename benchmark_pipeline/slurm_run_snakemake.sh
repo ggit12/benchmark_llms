@@ -8,4 +8,4 @@
 #SBATCH --output=log/benchmark_pipeline_%j.log
 
 source activate benchmark_llms
-snakemake --snakefile Snakefile --profile slurm --rerun-incomplete
+snakemake --snakefile Snakefile --profile slurm_profile --rerun-incomplete

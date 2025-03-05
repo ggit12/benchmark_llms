@@ -42,13 +42,17 @@ pip install -r requirements.txt
 
 ## Pipeline Execution
 
-Run the pipeline from within `benchmark_pipeline/`:
+First `cd` into `benchmark_pipeline/`:
 ```bash
 cd benchmark_pipeline/
+```
+
+Then run the pipeline with snakemake:
+```bash
 snakemake --snakefile Snakefile
 ```
 
-If you are running on a computing cluster with slurm, you can run the pipeline like this:
+Or, if you are running on a computing cluster with slurm, you can run the pipeline like this:
 ```bash
 sbatch slurm_run_snakemake.sh
 ```
