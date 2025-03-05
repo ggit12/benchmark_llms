@@ -9,8 +9,6 @@ import argparse
 import anndict as adt
 
 from dotenv import load_dotenv
-
-# Load variables from .env in the same directory
 load_dotenv()
 
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var

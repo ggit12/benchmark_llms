@@ -14,9 +14,19 @@ import sys
 
 import anndict as adt
 
+from dotenv import load_dotenv
+load_dotenv()
+
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path
-from src import cell_type_by_plurality # pylint: disable=wrong-import-position
+
+# pylint: disable=wrong-import-position
+from src import (
+    cell_type_by_plurality,
+    PROVIDERS,
+)
+
+
 
 
 # Load the results
@@ -63,14 +73,20 @@ adata = adt.concatenate_adata_dict(adata_dict)
 
 # Process the labels
 #Configure the backend to work with a specific provider and model
-adt.configure_llm_backend(provider='anthropic',
-                          model='claude-3-5-sonnet-20240620',
-                          api_key=os.environ['ANTHROPIC_API_KEY'],
-                          requests_per_minute=400
-                          )
+provider = os.environ['PROVIDER_FOR_DOWNSTREAM_ANALYSIS']
+llm_config = {provider: PROVIDERS[provider]}
+llm_config['model'] = os.environ['MODEL_FOR_DOWNSTREAM_ANALYSIS']
+
+adt.configure_llm_backend(**llm_config)
+
+# adt.configure_llm_backend(provider='anthropic',
+#                           model='claude-3-5-sonnet-20240620',
+#                           api_key=os.environ['ANTHROPIC_API_KEY'],
+#                           requests_per_minute=400
+#                           )
 # adt.configure_llm_backend(provider='openai',
 #                           model='gpt-4o',
-#                           api_key=provider_config['openai']['api_key'],
+#                           api_key=os.environ['OPENAI_API_KEY'],
 #                           requests_per_minute=9950)
 
 

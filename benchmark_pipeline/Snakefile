@@ -9,7 +9,6 @@ import os
 import sys
 
 from dotenv import load_dotenv
-
 load_dotenv()
 
 source_dir = os.environ["SOURCE_DIR"]
@@ -28,7 +27,7 @@ rule o1_preprocess_ts2:
         directory("res/preprocessed_tissue_adt_ts2")
     resources: # sbatch flag to which snakemake maps
         partition="cpu", # --partition
-        mem="600G", # --mem
+        mem="800G", # --mem
         cpus=30, # --cpus-per-task
         runtime=120, # --time
         tasks=1, # --ntasks

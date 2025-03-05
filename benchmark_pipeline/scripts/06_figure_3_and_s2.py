@@ -13,8 +13,10 @@ import scanpy as sc
 import matplotlib
 import matplotlib.pyplot as plt
 
-
 from anndict.utils.anndata_ import filter_gene_list
+
+from dotenv import load_dotenv
+load_dotenv()
 
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path

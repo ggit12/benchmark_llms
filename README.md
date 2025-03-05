@@ -32,6 +32,7 @@ cp benchmark_pipeline/.env_template benchmark_pipeline/.env
 3. Edit your `.env` file in `benchmark_pipeline/` as needed, including:
     - LLM provider API keys
     - Data path
+    - LLM used for downstream analysis
 4. Create a conda environment with `anndict`, `snakemake`, and `selenium`
 ```bash
 conda create -n benchmark_llms python=3.12

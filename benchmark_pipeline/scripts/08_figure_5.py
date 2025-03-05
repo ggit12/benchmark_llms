@@ -27,6 +27,9 @@ import matplotlib.pyplot as plt
 
 from anndict.utils.anndata_ import filter_gene_list
 
+from dotenv import load_dotenv
+load_dotenv()
+
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path
 
@@ -88,7 +91,8 @@ adata_topleft = adt.concatenate_adata_dict(adt.build_adata_dict(adata, strata_ke
 
 # Panel A
 # ai_cell_type_col = 'consistent_including_manual_claude-3-5-sonnet-20240620_simplified_ai_cell_type'
-ai_cell_type_col = 'consistent_including_manual_gpt-4o_simplified_ai_cell_type'
+# ai_cell_type_col = 'consistent_including_manual_gpt-4o_simplified_ai_cell_type'
+ai_cell_type_col = 'consistent_including_manual_' + os.environ['MODEL_FOR_DOWNSTREAM_ANALYSIS'] + '_simplified_ai_cell_type'
 cm_topleft = adt.plot_confusion_matrix_from_adata(adata_topleft,
     true_label_key='consistent_including_manual_' + manual_cell_type_col,
     predicted_label_key=ai_cell_type_col,
@@ -116,7 +120,7 @@ gene_lists = {
         "CSF1R",
         "ITGAM"  # CD11b
     ],
-    
+
     "Macrophage_Specific": [
         "ADGRE1",  # EMR1, human equivalent of F4/80
         "CD163",
@@ -124,28 +128,28 @@ gene_lists = {
         "MSR1",   # CD204
         "MRC1"    # CD206
     ],
-    
+
     "Stomach_Tissue_Resident_Macrophage": [
         "LYVE1",
         "TIMD4",
         "GATA6",
         "SIGLEC1"  # CD169, often on tissue-resident macrophages
     ],
-    
+
     "Monocyte_Markers": [
         "FCN1",
         "S100A8",
         "S100A9",
         "CCR2"
     ],
-    
+
     "Dendritic_Cell_Markers": [
         "ZBTB46",
         "FLT3",
         "CD1C",
         "CLEC10A"  # CD301, often on human DCs
     ],
-    
+
     "Macrophage_Function": [
         "MARCO",
         "MMP9",
@@ -154,7 +158,7 @@ gene_lists = {
         "FTH1",
         "CD64"     # FCGR1A, important for phagocytosis
     ],
-    
+
     "Stomach_Specific_Factors": [
         "SLC9A3",  # Sodium/hydrogen exchanger (acid resistance)
         "ATP4A",   # Proton pump (acid production)
@@ -162,7 +166,7 @@ gene_lists = {
         "MUC5AC",  # Mucin 5AC (mucosal protection)
         "CXCL8"    # IL-8, often produced by human stomach macrophages
     ],
-    
+
     "Human_Specific_Macrophage_Markers": [
         "CD16",   # FCGR3A, expressed on some human macrophage subsets
         "CD32",   # FCGR2A, another Fc receptor on human macrophages
@@ -175,7 +179,6 @@ gene_lists = {
 adata_temp = adt.build_adata_dict(adata_topleft, strata_keys=[manual_cell_type_col])
 
 # TODO: Code below here won't run unless on bigger object
-
 
 # Define the gene sets
 # macrophage_genes = ['CD68', 'CD163', 'MRC1', 'MERTK', 'CSF1R', 'EMR1']

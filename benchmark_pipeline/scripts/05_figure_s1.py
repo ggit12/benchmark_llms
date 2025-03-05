@@ -11,6 +11,9 @@ import anndict as adt
 import scanpy as sc
 import matplotlib
 
+from dotenv import load_dotenv
+load_dotenv()
+
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path
 
