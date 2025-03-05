@@ -41,7 +41,9 @@ pip install -r requirements.txt
 ```
 
 ## Pipeline Execution
+Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
 
+To run the pipeline:  
 First `cd` into `benchmark_pipeline/`:
 ```bash
 cd benchmark_pipeline/
@@ -54,13 +56,21 @@ snakemake --snakefile Snakefile
 
 Or, if you are running on a computing cluster with slurm, you can run the pipeline like this:
 ```bash
+tmux new -s snakemake -d
+tmux send-keys -t snakemake "cd $(pwd) && \
+conda activate benchmark_llms && \
+snakemake --snakefile Snakefile --profile slurm_profile" C-m
+```
+
+Note that this specific command might require some debugging, depending on your specific system configurations. For example, if conda is nto initialized in your `.bashrc`, this might fail. 
+In this case, you can try manually by following the example below.
+```bash
 tmux new -s snakemake
+cd /path/to/benchmark_llms/benchmark_pipeline
+
+<<<Initialize conda here (however you normally would)>>>
+
+conda activate benchmark_llms
 snakemake --snakefile Snakefile --profile slurm_profile
 ```
-
-Then, detach with `Ctrl+B`, `D` and reattach later using:
-```bash
-tmux attach -t snakemake
-```
-
-Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
+Then `Ctrl+B`, `D` to detach from the session and leave it running in the background.
