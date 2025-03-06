@@ -5,3 +5,4 @@ selenium
 python-dotenv
 adjustText
 igraph
+leidenalg
