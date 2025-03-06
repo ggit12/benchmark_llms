@@ -27,7 +27,7 @@ rule o1_preprocess_ts2:
         directory("res/preprocessed_tissue_adt_ts2")
     resources: # sbatch flag to which snakemake maps
         partition="cpu", # --partition
-        mem="800G", # --mem
+        mem="1000G", # --mem
         cpus=30, # --cpus-per-task
         runtime=240, # --time
         tasks=1, # --ntasks
@@ -42,7 +42,7 @@ rule o2_run_openai:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
         partition="cpu",
-        mem=500,
+        mem="500G",
         cpus=30,
         runtime=480,
         ntasks=1,
@@ -62,7 +62,7 @@ rule o2_run_anthropic:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
     resources:
         partition="cpu",
-        mem=500,
+        mem="500G",
         cpus=30,
         runtime=480,
         ntasks=1,
@@ -82,7 +82,7 @@ rule o2_run_bedrock:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
     resources:
         partition="cpu",
-        mem=500,
+        mem="500G",
         cpus=30,
         runtime=480,
         ntasks=1,
@@ -102,7 +102,7 @@ rule o2_run_google:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
     resources:
         partition="cpu",
-        mem=500,
+        mem="500G",
         cpus=30,
         runtime=480,
         ntasks=1,
