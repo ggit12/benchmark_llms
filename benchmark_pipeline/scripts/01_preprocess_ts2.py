@@ -8,6 +8,7 @@ import os
 
 import anndict as adt
 import scanpy as sc
+import gc
 
 #read data
 adata = sc.read_h5ad(os.environ["INPUT_DATA"]) # pylint: disable=line-too-long
@@ -42,6 +43,9 @@ abundant_rnas = [
 ]
 
 adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
+
+#free memory
+gc.collect()
 
 #Run leiden clustering on each adata independently
 #adata.X is raw counts, so run standard preprocessing
