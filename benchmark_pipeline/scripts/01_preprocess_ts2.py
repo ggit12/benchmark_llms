@@ -45,6 +45,7 @@ abundant_rnas = [
 adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
 
 #free memory
+del adata
 gc.collect()
 
 #Need to set use_multithreading to False to avoid overloading the memory
