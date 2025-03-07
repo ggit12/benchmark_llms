@@ -50,7 +50,7 @@ abundant_rnas = [
 adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
 
 # Take only protein coding genes
-protein_coding_genes = adata.var.query('gene_type == "protein_coding"').index
+# protein_coding_genes = adata.var.query('gene_type == "protein_coding"').index
 
 #free memory
 del adata
