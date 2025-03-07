@@ -3,6 +3,7 @@ This script preprocesses the TSPv2 dataset for annotation benchmarking.
 
 Runs from the root of the benchmark_pipeline directory.
 """
+# pylint: disable=line-too-long
 
 import os
 
@@ -11,7 +12,7 @@ import scanpy as sc
 import gc
 
 #read data
-adata = sc.read_h5ad(os.environ["INPUT_DATA"]) # pylint: disable=line-too-long
+adata = sc.read_h5ad(os.environ["INPUT_DATA"]) 
 
 #remove extra obsm and layers for memory purposes
 # Delete all the extra data
@@ -68,10 +69,10 @@ adt.wrappers.scale_adata_dict(adata_dict, use_multithreading=False)
 adt.wrappers.pca_adata_dict(adata_dict, n_comps=50, mask_var='highly_variable', use_multithreading=False)
 
 #Calculate the neighborhood graph
-adt.wrappers.neighbors_adata_dict(adata_dict, use_multithreading=False)
+adt.wrappers.neighbors_adata_dict(adata_dict) # Already disables multithreading because sc.pp.neighbors is multithreaded
 
 #Calculate the UMAP
-adt.wrappers.calculate_umap_adata_dict(adata_dict, use_multithreading=False)
+adt.wrappers.calculate_umap_adata_dict(adata_dict) # Same as above
 
 #get leiden clusters
 adt.wrappers.leiden_adata_dict(adata_dict, resolution=0.5, use_multithreading=False)
