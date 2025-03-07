@@ -47,31 +47,33 @@ adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
 #free memory
 gc.collect()
 
+#Need to set use_multithreading to False to avoid overloading the memory
+
 #Run leiden clustering on each adata independently
 #adata.X is raw counts, so run standard preprocessing
 # Normalize each AnnData in the dictionary
-adt.wrappers.normalize_adata_dict(adata_dict)
+adt.wrappers.normalize_adata_dict(adata_dict, use_multithreading=False)
 
 # Log transform each AnnData in the dictionary
-adt.wrappers.log_transform_adata_dict(adata_dict)
+adt.wrappers.log_transform_adata_dict(adata_dict, use_multithreading=False)
 
 # Optionally, you might subset the data to only high-variance genes
-adt.wrappers.set_high_variance_genes_adata_dict(adata_dict, n_top_genes=2000, subset=False)
+adt.wrappers.set_high_variance_genes_adata_dict(adata_dict, n_top_genes=2000, subset=False, use_multithreading=False)
 
 # Scale each AnnData in the dictionary
-adt.wrappers.scale_adata_dict(adata_dict)
+adt.wrappers.scale_adata_dict(adata_dict, use_multithreading=False)
 
 # Perform PCA on each AnnData in the dictionary
-adt.wrappers.pca_adata_dict(adata_dict, n_comps=50, mask_var='highly_variable')
+adt.wrappers.pca_adata_dict(adata_dict, n_comps=50, mask_var='highly_variable', use_multithreading=False)
 
 #Calculate the neighborhood graph
-adt.wrappers.neighbors_adata_dict(adata_dict)
+adt.wrappers.neighbors_adata_dict(adata_dict, use_multithreading=False)
 
 #Calculate the UMAP
-adt.wrappers.calculate_umap_adata_dict(adata_dict)
+adt.wrappers.calculate_umap_adata_dict(adata_dict, use_multithreading=False)
 
 #get leiden clusters
-adt.wrappers.leiden_adata_dict(adata_dict, resolution=0.5)
+adt.wrappers.leiden_adata_dict(adata_dict, resolution=0.5, use_multithreading=False)
 
 # Set the var index to the gene name because the index is what will be used by the LLM
 # adata_dict.set_var_index('feature_name')
@@ -80,7 +82,7 @@ adt.wrappers.leiden_adata_dict(adata_dict, resolution=0.5)
 # adata_dict = adt.sample_and_drop_adata_dict(adata_dict, strata_keys=['leiden'], min_num_cells=5)
 
 # Run diffexp analysis
-adt.wrappers.rank_genes_groups_adata_dict(adata_dict, groupby='leiden')
+adt.wrappers.rank_genes_groups_adata_dict(adata_dict, groupby='leiden', use_multithreading=False)
 
 # Write the preprocessed AdataDict
 adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
