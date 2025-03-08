@@ -42,8 +42,8 @@ rule o2_run_openai:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
         partition="cpu",
-        mem="500G",
-        cpus=30,
+        mem="800G",
+        # cpus=30,
         runtime=480,
         ntasks=1,
     params:
@@ -62,8 +62,8 @@ rule o2_run_anthropic:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
     resources:
         partition="cpu",
-        mem="500G",
-        cpus=30,
+        mem="800G",
+        # cpus=30,
         runtime=480,
         ntasks=1,
     params:
@@ -82,8 +82,8 @@ rule o2_run_bedrock:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
     resources:
         partition="cpu",
-        mem="500G",
-        cpus=30,
+        mem="800G",
+        # cpus=30,
         runtime=480,
         ntasks=1,
     params:
@@ -102,8 +102,8 @@ rule o2_run_google:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
     resources:
         partition="cpu",
-        mem="500G",
-        cpus=30,
+        mem="800G",
+        # cpus=30,
         runtime=480,
         ntasks=1,
     params:
@@ -134,8 +134,8 @@ rule o3_aggregate_results:
         'res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl',
     resources:
         partition="cpu",
-        mem="400G",
-        cpus=30,
+        mem="800G",
+        # cpus=30,
         runtime=300,
         ntasks=1,
     shell:
