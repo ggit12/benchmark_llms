@@ -6,11 +6,15 @@ Runs from the root of the benchmark_pipeline directory.
 # pylint: disable=line-too-long
 
 import os
+import gc
+import csv
+import sys
+import pkg_resources
 
 import anndict as adt
 import scanpy as sc
-import gc
 import psutil
+
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -50,7 +54,15 @@ abundant_rnas = [
 adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
 
 # Take only protein coding genes
-# protein_coding_genes = adata.var.query('gene_type == "protein_coding"').index
+#load list of protein-coding genes
+source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
+sys.path.append(os.path.join(source_dir))  # add to Python path
+
+protein_coding_path = pkg_resources.resource_filename('src', 'dat/protein_coding_genes_list.csv')
+with open(protein_coding_path, 'r', encoding='utf-8') as file:
+    protein_coding = list(csv.reader(file, delimiter=','))
+protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end removes empty genes (i.e. "") from the list
+
 
 #free memory
 del adata
