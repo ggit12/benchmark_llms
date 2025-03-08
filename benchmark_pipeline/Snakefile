@@ -24,7 +24,7 @@ rule o1_preprocess_ts2:
     input:
         os.environ["INPUT_DATA"]
     output:
-        directory("res/preprocessed_tissue_adt_ts2")
+        directory("dat/preprocessed_tissue_adt_ts2")
     resources: # sbatch flag to which snakemake maps
         partition="cpu", # --partition
         mem="800G", # --mem
@@ -37,7 +37,7 @@ rule o1_preprocess_ts2:
 
 rule o2_run_openai:
     input:
-        "res/preprocessed_tissue_adt_ts2"
+        "dat/preprocessed_tissue_adt_ts2"
     output:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
@@ -57,7 +57,7 @@ rule o2_run_openai:
 
 rule o2_run_anthropic:
     input:
-        "res/preprocessed_tissue_adt_ts2"
+        "dat/preprocessed_tissue_adt_ts2"
     output:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
     resources:
@@ -77,7 +77,7 @@ rule o2_run_anthropic:
 
 rule o2_run_bedrock:
     input:
-        "res/preprocessed_tissue_adt_ts2"
+        "dat/preprocessed_tissue_adt_ts2"
     output:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
     resources:
@@ -97,7 +97,7 @@ rule o2_run_bedrock:
 
 rule o2_run_google:
     input:
-        "res/preprocessed_tissue_adt_ts2"
+        "dat/preprocessed_tissue_adt_ts2"
     output:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
     resources:
