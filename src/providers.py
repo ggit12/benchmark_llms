@@ -43,7 +43,7 @@ class ProviderEndpoints:
 # Define providers
 PROVIDERS = {
     "openai": ProviderConfig("openai", os.getenv("OPENAI_API_KEY"), 9950),
-    "anthropic": ProviderConfig("anthropic", os.getenv("ANTHROPIC_API_KEY"), 950),
+    "anthropic": ProviderConfig("anthropic", os.getenv("ANTHROPIC_API_KEY"), 300),
     "google": ProviderConfig("google", os.getenv("GOOGLE_API_KEY"), 200),
     "huggingface": ProviderConfig("huggingface", os.getenv("HUGGINGFACE_API_KEY")),
     "azureml_endpoint": ProviderConfig(
