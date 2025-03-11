@@ -14,7 +14,7 @@ load_dotenv()
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path
 
-from src import PROVIDERS, ENDPOINTS, run_multiple_providers_models
+from src import PROVIDERS, ENDPOINTS, run_multiple_providers_models # pylint: disable=wrong-import-position
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--provider", required=True, help="Name of the provider")
@@ -34,6 +34,17 @@ completed_models = [
     if args.provider in f
 ]
 model_list = [m for m in all_models if m not in completed_models]
+
+# Print information for debugging
+print(f"All models: {all_models}")
+print(f"Files in directory: {os.listdir(args.outdir)}")
+print(f"Completed models: {completed_models}")
+print(f"Models to run: {model_list}")
+
+#End if all models have been run
+if not model_list:
+    print(f"All models for {args.provider} have already been run.")
+    sys.exit(0)
 
 # Create a dict mapping this provider to its models
 provider_endpoint_dict = {args.provider: model_list}

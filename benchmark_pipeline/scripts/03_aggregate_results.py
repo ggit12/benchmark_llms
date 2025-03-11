@@ -27,8 +27,6 @@ from src import (
 )
 
 
-
-
 # Load the results
 results_paths = [f for f in glob.glob('./res/02_run_provider/*.pkl')]
 
