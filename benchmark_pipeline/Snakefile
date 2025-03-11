@@ -144,7 +144,7 @@ rule o3_aggregate_results:
         'res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl',
     resources:
         partition="cpu",
-        mem="1000G",
+        mem="1500G",
         # cpus=30,
         runtime=300,
         ntasks=1,
