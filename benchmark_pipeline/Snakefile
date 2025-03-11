@@ -56,7 +56,7 @@ rule o2_run_openai:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
     resources:
         partition="cpu",
-        mem="800G",
+        mem="600G",
         # cpus=30,
         runtime=480,
         ntasks=1,
@@ -76,7 +76,7 @@ rule o2_run_anthropic:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
     resources:
         partition="cpu",
-        mem="800G",
+        mem="600G",
         # cpus=30,
         runtime=480,
         ntasks=1,
@@ -96,7 +96,7 @@ rule o2_run_bedrock:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
     resources:
         partition="cpu",
-        mem="800G",
+        mem="600G",
         # cpus=30,
         runtime=480,
         ntasks=1,
@@ -116,7 +116,7 @@ rule o2_run_google:
         expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
     resources:
         partition="cpu",
-        mem="800G",
+        mem="600G",
         # cpus=30,
         runtime=480,
         ntasks=1,
@@ -140,7 +140,7 @@ rule o3_gather_results:
         'res/03_gather_results/ts2_de_novo_llm_annotated.h5ad',
     resources:
         partition="cpu",
-        mem="1500G",
+        mem="800G",
         # cpus=30,
         runtime=300,
         ntasks=1,
