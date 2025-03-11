@@ -11,6 +11,7 @@ import pickle
 import os
 import glob
 import sys
+import gc
 
 import anndict as adt
 
@@ -70,9 +71,19 @@ print("Merging obs columns into adata_dict", flush=True)
 merge_obs_to_adata(adata_dict, results)
 print("Merged obs columns into adata_dict", flush=True)
 
+# Free up memory
+del results
+gc.collect()
+print("deleted ``results`` to free memory", flush=True)
+
 # Merge the adata_dict
-adata = adt.concatenate_adata_dict(adata_dict)
+adata = adt.concatenate_adata_dict(adata_dict, new_col_name=None) # To achieve future default behavior, setting new_col_name to None
 print("Concatenated adata_dict", flush=True)
+
+# Free up memory
+del adata_dict
+gc.collect()
+print("deleted ``adata_dict`` to free memory", flush=True)
 
 # After merging the AnnData, the labels are then processed so that various metrics can be calculated using them.
 
@@ -145,7 +156,7 @@ base_path = './res/03_gather_outputs/'
 # pickle.dump(adata_dict, open(base_path + "ts2_de_novo_llm_annotated_adt", 'wb'))
 
 #adata
-del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
+# del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
 adata.write_h5ad('./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad')
 print("Wrote adata", flush=True)
 
