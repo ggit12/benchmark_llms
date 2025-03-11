@@ -63,9 +63,11 @@ def merge_obs_to_adata(adata_dict, results):
 # Assuming adata_dict and results are already defined and populated
 # adata_dict = merge_obs_to_adata(adata_dict, results)
 merge_obs_to_adata(adata_dict, results)
+print("Merged obs columns into adata_dict")
 
 # Merge the adata_dict
 adata = adt.concatenate_adata_dict(adata_dict)
+print("Concatenated adata_dict")
 
 # After merging the AnnData, the labels are then processed so that various metrics can be calculated using them.
 
@@ -106,20 +108,19 @@ unified_cell_types_with_manual = adt.get_adata_columns(adata, contains=['consist
 #calculate a cell type by majority vote of all the LLMs
 llm_celltype_cols = adt.get_adata_columns(adata, contains=['consistent_including_manual'], not_contains=[manual_cell_type_col])
 cell_type_by_plurality(adata, rater_cols=llm_celltype_cols, new_col_name='cell_type_by_plurality')
-
+print("Calculated cell type by plurality")
 
 
 #assess the agreement between the 'consistified' manual annotations and the ai-generated annotations
 label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, ['consistent_including_manual_' + manual_cell_type_col], llm_celltype_cols, new_col_prefix='binary_agreement', comparison_level='binary')
-
+print("Calculated binary agreement")
 
 #get these column names
 binary_agreement_cols = adt.get_adata_columns(adata, contains = ['binary_agreement_consistent_including_manual'])
 
-
-
 #also assess at the partial agreement level
 label_agreement_categorical = adt.ai_compare_cell_type_labels_pairwise(adata, ['consistent_including_manual_' + manual_cell_type_col], llm_celltype_cols, new_col_prefix='categorical_agreement', comparison_level='categorical')
+print("Calculated categorical agreement")
 
 #get these column names
 categorical_agreement_cols = adt.get_adata_columns(adata, contains = ['categorical_agreement_consistent_including_manual'])
@@ -127,11 +128,10 @@ categorical_agreement_cols = adt.get_adata_columns(adata, contains = ['categoric
 #change scale of categorical label agreement cols from 0 to 1 (raw has values 0, 1, and 2)
 adata.obs[categorical_agreement_cols] = adata.obs[categorical_agreement_cols]/2
 
-
 #use categorical labels to count only perfect matches, and set partial matches to 0
 perfect_only_categorical_agreement_cols = ["perfect_only_" + col for col in categorical_agreement_cols]
 adata.obs[perfect_only_categorical_agreement_cols] = adata.obs[categorical_agreement_cols].replace(0.5, 0)
-
+print("Calculated perfect only categorical agreement")
 
 # Write out all generated objects
 base_path = './res/03_gather_outputs/'
@@ -142,6 +142,7 @@ base_path = './res/03_gather_outputs/'
 #adata
 del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
 adata.write_h5ad('./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad')
+print("Wrote adata")
 
 #label_map_with_manual
 pickle.dump(label_map_with_manual, open(base_path + 'label_map_with_manual.pkl', 'wb'))
@@ -158,3 +159,4 @@ pickle.dump(llm_celltype_cols, open(base_path + 'llm_celltype_cols.pkl', 'wb'))
 pickle.dump(binary_agreement_cols, open(base_path + 'binary_agreement_cols.pkl', 'wb'))
 pickle.dump(categorical_agreement_cols, open(base_path + 'categorical_agreement_cols.pkl', 'wb'))
 pickle.dump(perfect_only_categorical_agreement_cols, open(base_path + 'perfect_only_categorical_agreement_cols.pkl', 'wb'))
+print("Wrote all outputs")
