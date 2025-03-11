@@ -60,8 +60,7 @@ Or, if you are running on a computing cluster with slurm, you can run the pipeli
 tmux new -s snakemake -d
 tmux send-keys -t snakemake "cd $(pwd) && \
 conda activate benchmark_llms && \
-snakemake --snakefile Snakefile --profile slurm_profile && \
-tmux kill-session -t snakemake" C-m
+snakemake --snakefile Snakefile --profile slurm_profile" C-m
 ```
 
 Note that this specific command might require some debugging, depending on your specific system configurations. For example, if conda is not initialized in your `.bashrc`, this might fail. 
