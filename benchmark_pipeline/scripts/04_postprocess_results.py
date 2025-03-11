@@ -49,7 +49,7 @@ adt.configure_llm_backend(**llm_config)
 #                           requests_per_minute=9950)
 
 # Read the merged AnnData
-adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated_adt')
+adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
 
 
 #get cell type columns

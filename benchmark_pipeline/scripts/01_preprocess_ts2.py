@@ -33,6 +33,19 @@ for key in ['decontXcounts', 'log_normalized', 'scale_data']:
 #set X to be raw_counts
 adata.X = adata.layers['raw_counts'].copy()
 
+# Take only protein coding genes
+source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
+sys.path.append(os.path.join(source_dir))  # add to Python path
+
+#load list of protein-coding genes
+protein_coding_path = pkg_resources.resource_filename('src', 'dat/protein_coding_genes_list.csv')
+with open(protein_coding_path, 'r', encoding='utf-8') as file:
+    protein_coding = list(csv.reader(file, delimiter=','))
+protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end removes empty genes (i.e. "") from the list
+
+#filter adata to only include protein coding genes
+adata = adata[:, adata.var.index.isin(protein_coding)]
+
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
 
@@ -52,16 +65,6 @@ abundant_rnas = [
 ]
 
 adt.wrappers.remove_genes_adata_dict(adata_dict, abundant_rnas)
-
-# Take only protein coding genes
-#load list of protein-coding genes
-source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
-sys.path.append(os.path.join(source_dir))  # add to Python path
-
-protein_coding_path = pkg_resources.resource_filename('src', 'dat/protein_coding_genes_list.csv')
-with open(protein_coding_path, 'r', encoding='utf-8') as file:
-    protein_coding = list(csv.reader(file, delimiter=','))
-protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end removes empty genes (i.e. "") from the list
 
 
 #free memory
