@@ -28,6 +28,7 @@ from src import (
 
 
 # Load the results
+print("Loading results")
 results_paths = [f for f in glob.glob('./res/02_run_provider/*.pkl')]
 
 results = {}
@@ -36,9 +37,12 @@ for path in results_paths:
         model_results = pickle.load(f)
         model_name = os.path.basename(path).replace('.pkl', '')
         results[model_name] = model_results
+print("Loaded results")
 
 # Load the adata_dict
+print("Loading adata_dict")
 adata_dict = adt.read_adata_dict('./dat/preprocessed_tissue_adt_ts2')
+print("Loaded adata_dict")
 
 def merge_obs_to_adata(adata_dict, results):
     """Merges obs columns that have annotations into adata_dict"""
@@ -62,6 +66,7 @@ def merge_obs_to_adata(adata_dict, results):
 
 # Assuming adata_dict and results are already defined and populated
 # adata_dict = merge_obs_to_adata(adata_dict, results)
+print("Merging obs columns into adata_dict")
 merge_obs_to_adata(adata_dict, results)
 print("Merged obs columns into adata_dict")
 
