@@ -18,7 +18,17 @@ from src import PROVIDERS, ENDPOINTS
 
 rule all:
     input:
+        #to trigger o1, o2, o3, o4, o5, o6, o7, o8
         'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
+
+        #to trigger o5
+        "res/05_figure_s1/done",
+
+        #to trigger o6
+        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        # These files below won't run unless on the bigger object
+        "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+
 
 rule o1_preprocess_ts2:
     input:
