@@ -37,26 +37,26 @@ from src import REMOVE_TICK_LABELS as remove_tick_labels
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
 
 # And the various column names
 manual_cell_type_col = pickle.load(
-    open("./res/03_gather_outputs/manual_cell_type_col.pkl", "rb")
+    open("./res/04_postprocess_results/manual_cell_type_col.pkl", "rb")
 )
 
 binary_agreement_cols_top_models = pickle.load(
-    open("./res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
 )
 
 perfect_only_categorical_agreement_cols_top_models = pickle.load(
     open(
-        "./res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
+        "./res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
         "rb",
     )
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/03_gather_outputs/llm_celltype_cols.pkl", "rb")
+    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
 )
 
 # get the top 10 cell types by count
@@ -87,7 +87,7 @@ customize_figure(
 
 # Save the plot as an SVG file
 agreement_plot_top_celltypes[0].savefig(
-    "./res/06_figure_3_and_s2/agreement_plot_largest_celltypes.svg", format="svg"
+    "./res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg", format="svg"
 )
 
 # Bottom of A
@@ -108,7 +108,7 @@ customize_figure(
     fig_height=3,
 )
 agreement_plot_overall_categorical_perfect_celltypes[0].savefig(
-    "./res/06_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
+    "./res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
     format="svg",
 )
 
@@ -154,13 +154,13 @@ for col in binary_agreement_cols_top_models:
         "",
     )
     agreement_plot_custom[0].savefig(
-        f"./res/06_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes.svg",
+        f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes.svg",
         format="svg",
     )
 
 # Write a done file for the above agreement plots
 with open(
-    "./res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done",
+    "./res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done",
     "w", encoding="utf-8",
 ) as f:
     f.write("done")
@@ -193,7 +193,7 @@ customize_scatterplot(
 
 # Save the plot as an SVG file
 agreement_scatterplot_large_celltypes[0].savefig(
-    "./res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
+    "./res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
     format="svg",
 )
 
@@ -220,7 +220,7 @@ sankey_ai_to_man = adt.wrappers.plot_sankey_adata_dict(
 )
 adt.wrappers.save_sankey_adata_dict(
     sankey_ai_to_man,
-    filename="./res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",  # Dynamic filename for each plot
+    filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells.svg",  # Dynamic filename for each plot
 )
 
 # Above might fail for basal cells, so do:
@@ -234,7 +234,7 @@ sankey_ai_to_man_basal_cells = adt.plot_sankey(
 )
 adt.save_sankey(
     sankey_ai_to_man_basal_cells,
-    filename="./res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",  # Dynamic filename for each plot
+    filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",  # Dynamic filename for each plot
 )
 
 # Get adata for basal and stromal cells
@@ -353,17 +353,17 @@ customize_figure(
     },
 )
 basal_module_fig.savefig(
-    "./res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg", format="svg"
 )
 
 customize_scatterplot((epi_fig, epi_ax))
 epi_fig.savefig(
-    "./res/06_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg", format="svg"
 )
 
 customize_scatterplot((basal_fig, basal_ax))
 basal_fig.savefig(
-    "./res/06_figure_3_and_s2/basal_module_umap_in_basal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg", format="svg"
 )
 
 
@@ -453,15 +453,15 @@ ov_module_ax.set_ylim(-0.05, 0.2)
 ov_module_ax.axhline(y=0, color="black", linestyle="--", linewidth=0.5)
 
 ov_module_fig.savefig(
-    "./res/06_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg", format="svg"
 )
 
 customize_scatterplot((gran_fig, gran_ax))
 gran_fig.savefig(
-    "./res/06_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg", format="svg"
 )
 
 customize_scatterplot((stromal_fig, stromal_ax))
 stromal_fig.savefig(
-    "./res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", format="svg"
+    "./res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", format="svg"
 )

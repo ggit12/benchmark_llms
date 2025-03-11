@@ -44,37 +44,37 @@ from src import (
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
 
 # Read the agreement_df and agreement_weights_df
-agreement_df = pickle.load(open("./res/07_figure_4/agreement_df.pkl", "rb"))
-agreement_weights_df = pickle.load(open("./res/07_figure_4/agreement_weights_df.pkl", "rb"))
+agreement_df = pickle.load(open("./res/08_figure_4/agreement_df.pkl", "rb"))
+agreement_weights_df = pickle.load(open("./res/08_figure_4/agreement_weights_df.pkl", "rb"))
 
 # And the various column names
 manual_cell_type_col = pickle.load(
-    open("./res/03_gather_outputs/manual_cell_type_col.pkl", "rb")
+    open("./res/04_postprocess_results/manual_cell_type_col.pkl", "rb")
 )
 
 binary_agreement_cols_top_models = pickle.load(
-    open("./res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
 )
 
 categorical_agreement_cols_top_models = pickle.load(
     open(
-        "./res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
+        "./res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
         "rb",
     )
 )
 
 perfect_only_categorical_agreement_cols_top_models = pickle.load(
     open(
-        "./res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
+        "./res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
         "rb",
     )
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/03_gather_outputs/llm_celltype_cols.pkl", "rb")
+    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
 )
 
 cm_colorbar_df = agreement_df.join(agreement_weights_df.rename('agreement_weight'))
@@ -103,7 +103,7 @@ cm_topleft = adt.plot_confusion_matrix_from_adata(adata_topleft,
     predicted_ticklabels=True,
     annot=False)
 
-cm_topleft.savefig('./res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg', format='svg')
+cm_topleft.savefig('./res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg', format='svg')
 
 # Not in the figure
 # sankey_topleft = adt.plot_sankey(adata_topleft, cols=[ai_cell_type_col, manual_cell_type_col,])
@@ -227,7 +227,7 @@ customize_figure((module_fig, module_ax), fig_width=2.4, fig_height=3, new_tick_
                                                                                         "monocyte_score":"Monocyte Score",
                                                                                         "dendritic_score":"Dendritic Cell Score"})
 
-module_fig.savefig('./res/08_figure_5/gene_module_scores_in_phagocytes.svg', format='svg')
+module_fig.savefig('./res/09_figure_5/gene_module_scores_in_phagocytes.svg', format='svg')
 
 
 # Panel C
@@ -235,19 +235,19 @@ module_fig.savefig('./res/08_figure_5/gene_module_scores_in_phagocytes.svg', for
 fig1 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
 ax1 = fig1.axes[0]
 customize_scatterplot((fig1, ax1))
-fig1.savefig('./res/08_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
+fig1.savefig('./res/09_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
 
 # Plot and customize the second UMAP (Monocyte Score)
 fig2 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
 ax2 = fig2.axes[0]
 customize_scatterplot((fig2, ax2))
-fig2.savefig('./res/08_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
+fig2.savefig('./res/09_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
 
 # Plot and customize the third UMAP (Dendritic Cell Score)
 fig3 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
 ax3 = fig3.axes[0]
 customize_scatterplot((fig3, ax3))
-fig3.savefig('./res/08_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
+fig3.savefig('./res/09_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
 
 
 #To confirm which UMAP is which score

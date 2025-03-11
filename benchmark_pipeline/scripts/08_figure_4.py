@@ -29,33 +29,33 @@ from src import (
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
 
 # And the various column names
 manual_cell_type_col = pickle.load(
-    open("./res/03_gather_outputs/manual_cell_type_col.pkl", "rb")
+    open("./res/04_postprocess_results/manual_cell_type_col.pkl", "rb")
 )
 
 binary_agreement_cols_top_models = pickle.load(
-    open("./res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl", "rb")
 )
 
 categorical_agreement_cols_top_models = pickle.load(
     open(
-        "./res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
+        "./res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
         "rb",
     )
 )
 
 perfect_only_categorical_agreement_cols_top_models = pickle.load(
     open(
-        "./res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
+        "./res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
         "rb",
     )
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/03_gather_outputs/llm_celltype_cols.pkl", "rb")
+    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
 )
 
 
@@ -72,15 +72,15 @@ plt.rcParams['svg.fonttype'] = 'none'
 agreement_scatterplot_unweighted_unnormalized = plot_agreement(agreement_df=agreement_df, weights=agreement_weights_df, show_labels=False, show_legend=False, normalize_kdes=False)
 
 customize_scatterplot(agreement_scatterplot_unweighted_unnormalized, remove_legend=True, new_ylabel='Inter-rater Agreement', new_xlabel='Agreement with Manual Annotation')
-agreement_scatterplot_unweighted_unnormalized[0].savefig('./res/07_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg', format='svg')
+agreement_scatterplot_unweighted_unnormalized[0].savefig('./res/08_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg', format='svg')
 
 
 # Dot size wieghted by cell type size, marginal densities scaled to cell type sizes (panel B)
 agreement_scatterplot_weighted_normalized = plot_agreement(agreement_df=agreement_df, weights=agreement_weights_df, show_labels=False, show_legend=False, normalize_kdes=True)
 
 customize_scatterplot(agreement_scatterplot_weighted_normalized, remove_legend=True, new_ylabel='Inter-rater Agreement', new_xlabel='Agreement with Manual Annotation')
-agreement_scatterplot_weighted_normalized[0].savefig('./res/07_figure_4/agreement_scatterplot_overall_weighted_normalized.svg', format='svg')
+agreement_scatterplot_weighted_normalized[0].savefig('./res/08_figure_4/agreement_scatterplot_overall_weighted_normalized.svg', format='svg')
 
 # Write agreement_df and agreement_weights_df
-pickle.dump(agreement_df, open('./res/07_figure_4/agreement_df.pkl', 'wb'))
-pickle.dump(agreement_weights_df, open('./res/07_figure_4/agreement_weights_df.pkl', 'wb'))
+pickle.dump(agreement_df, open('./res/08_figure_4/agreement_df.pkl', 'wb'))
+pickle.dump(agreement_weights_df, open('./res/08_figure_4/agreement_weights_df.pkl', 'wb'))

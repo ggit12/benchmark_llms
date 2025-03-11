@@ -18,16 +18,20 @@ from src import PROVIDERS, ENDPOINTS
 
 rule all:
     input:
-        #to trigger o1, o2, o3, o4, o5, o6, o7, o8
-        'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
-
-        #to trigger o5
-        "res/05_figure_s1/done",
+        #to trigger o1, o2, o3, o4, o5, o8, o9
+        'res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
 
         #to trigger o6
-        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        "res/06_figure_s1/done",
+
+        #to trigger o7
+        "res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         # These files below won't run unless on the bigger object
-        "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+        "res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+
+# rule all:
+#     input:
+#         'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
 
 
 rule o1_preprocess_ts2:
@@ -126,22 +130,14 @@ rule o2_run_google:
         --outdir {params.outdir}"
 
 # Aggregate the results
-rule o3_aggregate_results:
+rule o3_gather_results:
     input:
         [f"res/02_run_provider/{provider}_{model}.pkl" 
                 for provider, models in ENDPOINTS.endpoints.items()
                 for model in models]
         # [f"res/02_run_provider/openai_{model}.pkl" for model in ENDPOINTS.endpoints["openai"]]
     output:
-        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
-        'res/03_gather_outputs/label_map_with_manual.pkl',
-        'res/03_gather_outputs/label_agreement_binary.pkl',
-        'res/03_gather_outputs/label_agreement_categorical.pkl',
-        'res/03_gather_outputs/manual_cell_type_col.pkl',
-        'res/03_gather_outputs/llm_celltype_cols.pkl',
-        'res/03_gather_outputs/binary_agreement_cols.pkl',
-        'res/03_gather_outputs/categorical_agreement_cols.pkl',
-        'res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl',
+        'res/03_gather_results/ts2_de_novo_llm_annotated.h5ad',
     resources:
         partition="cpu",
         mem="1500G",
@@ -149,25 +145,48 @@ rule o3_aggregate_results:
         runtime=300,
         ntasks=1,
     shell:
-        "python scripts/03_aggregate_results.py"
+        "python scripts/03_gather_results.py"
 
-rule o4_figure_2_and_table_2:
+# Aggregate the results
+rule o4_postprocess_results:
     input:
-        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad'
+        'res/03_gather_results/ts2_de_novo_llm_annotated.h5ad',
     output:
-        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_binary.svg',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
-        'res/04_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
-        'res/04_figure_2_and_table_2/kappa_clustermap_overall.svg',
-        'res/04_figure_2_and_table_2/average_pairwise_kappa.svg',
-        'res/04_figure_2_and_table_2/performance_table.html',
+        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+        'res/04_postprocess_results/label_map_with_manual.pkl',
+        'res/04_postprocess_results/label_agreement_binary.pkl',
+        'res/04_postprocess_results/label_agreement_categorical.pkl',
+        'res/04_postprocess_results/manual_cell_type_col.pkl',
+        'res/04_postprocess_results/llm_celltype_cols.pkl',
+        'res/04_postprocess_results/binary_agreement_cols.pkl',
+        'res/04_postprocess_results/categorical_agreement_cols.pkl',
+        'res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+    resources:
+        partition="cpu",
+        mem="600G",
+        # cpus=30,
+        runtime=300,
+        ntasks=1,
+    shell:
+        "python scripts/04_postprocess_results.py"
+
+rule o5_figure_2_and_table_2:
+    input:
+        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad'
+    output:
+        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
+        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+        'res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
+        'res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
+        'res/05_figure_2_and_table_2/performance_table.html',
     resources:
         partition="cpu",
         mem="400G",
@@ -175,14 +194,14 @@ rule o4_figure_2_and_table_2:
         runtime=300,
         ntasks=1,
     shell:
-        "python scripts/04_figure_2_and_table_2.py"
+        "python scripts/05_figure_2_and_table_2.py"
 
-rule o5_figure_s1:
+rule o6_figure_s1:
     input:
-        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
-        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
     output:
-        "res/05_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        "res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
     resources:
         partition="cpu",
         mem="400G",
@@ -190,28 +209,28 @@ rule o5_figure_s1:
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/05_figure_s1.py"
+        "python scripts/06_figure_s1.py"
 
-rule o6_figure_3_and_s2:
+rule o7_figure_3_and_s2:
     input:
-        'res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad',
-        'res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
-        'res/04_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+        'res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
     output:
-        "res/06_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
-        "res/06_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
-        "res/06_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
-        "res/06_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
+        "res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
+        "res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
+        "res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        "res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
         # These files below won't run unless on the bigger object
-        "res/06_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
-        "res/06_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
-        "res/06_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
-        "res/06_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
-        "res/06_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
-        "res/06_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
-        "res/06_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
-        "res/06_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
+        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
+        "res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
+        "res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
+        "res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
+        "res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
+        "res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
+        "res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
     resources:
         partition="cpu",
         mem="400G",
@@ -219,21 +238,21 @@ rule o6_figure_3_and_s2:
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/06_figure_3_and_s2.py"
+        "python scripts/07_figure_3_and_s2.py"
 
-rule o7_figure_4:
+rule o8_figure_4:
     input:
-        "res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad",
-        "res/03_gather_outputs/manual_cell_type_col.pkl",
-        "res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
-        "res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
-        "res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
-        "res/03_gather_outputs/llm_celltype_cols.pkl",
+        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+        "res/04_postprocess_results/manual_cell_type_col.pkl",
+        "res/04_postprocess_results/llm_celltype_cols.pkl",
+        "res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
+        "res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
+        "res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
     output:
-        'res/07_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
-        'res/07_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
-        'res/07_figure_4/agreement_df.pkl',
-        'res/07_figure_4/agreement_weights_df.pkl',
+        'res/08_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
+        'res/08_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
+        'res/08_figure_4/agreement_df.pkl',
+        'res/08_figure_4/agreement_weights_df.pkl',
     resources:
         partition="cpu",
         mem="400G",
@@ -241,21 +260,21 @@ rule o7_figure_4:
         time=120,
         ntasks=1,
     shell:
-        "python scripts/07_figure_4.py"
+        "python scripts/08_figure_4.py"
 
-rule o8_figure_5:
+rule o9_figure_5:
     input:
-        "res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad",
-        'res/07_figure_4/agreement_df.pkl',
-        'res/07_figure_4/agreement_weights_df.pkl',
+        "res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad",
+        'res/08_figure_4/agreement_df.pkl',
+        'res/08_figure_4/agreement_weights_df.pkl',
     output:
-        'res/08_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
-        # 'res/08_figure_5/sankey_topleft_of_agreement.svg',
+        'res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
+        # 'res/09_figure_5/sankey_topleft_of_agreement.svg',
         # These files below won't run unless on the bigger object
-        'res/08_figure_5/gene_module_scores_in_phagocytes.svg',
-        'res/08_figure_5/macrophage_module_umap_in_phagocytes.svg',
-        'res/08_figure_5/monocyte_module_umap_in_phagocytes.svg',
-        'res/08_figure_5/dendritic_module_umap_in_phagocytes.svg',
+        'res/09_figure_5/gene_module_scores_in_phagocytes.svg',
+        'res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',
+        'res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
+        'res/09_figure_5/dendritic_module_umap_in_phagocytes.svg',
     resources:
         partition="cpu",
         mem="400G",
@@ -263,4 +282,4 @@ rule o8_figure_5:
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/08_figure_5.py"
+        "python scripts/09_figure_5.py"

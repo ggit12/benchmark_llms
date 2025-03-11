@@ -2,15 +2,15 @@
 This script generates results presented in table 2. Also generates the information as figures (figures not used).
 
 Files saved:
-1. './res/04_figure_2_and_table_2/agreement_plot_overall_binary.svg'
-2. './res/04_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg'
-3. './res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg'
-4. './res/04_figure_2_and_table_2/agreement_plot_overall_categorical.svg'
-5. './res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg'
-6. './res/04_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg'
-7. './res/04_figure_2_and_table_2/kappa_clustermap_overall.svg'
-8. './res/04_figure_2_and_table_2/average_pairwise_kappa.svg'
-9. './res/04_figure_2_and_table_2/performance_table.html'
+1. './res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg'
+2. './res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg'
+3. './res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg'
+4. './res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg'
+5. './res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg'
+6. './res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg'
+7. './res/05_figure_2_and_table_2/kappa_clustermap_overall.svg'
+8. './res/05_figure_2_and_table_2/average_pairwise_kappa.svg'
+9. './res/05_figure_2_and_table_2/performance_table.html'
 
 """
 # pylint: disable=line-too-long
@@ -50,14 +50,14 @@ matplotlib.use('Agg')
 
 
 # Read the results
-adata = sc.read_h5ad('./res/03_gather_outputs/ts2_de_novo_llm_annotated.h5ad')
+adata = sc.read_h5ad('./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad')
 
 # And the various column names
-manual_cell_type_col = pickle.load(open('./res/03_gather_outputs/manual_cell_type_col.pkl', 'rb'))
-llm_celltype_cols = pickle.load(open('./res/03_gather_outputs/llm_celltype_cols.pkl', 'rb'))
-binary_agreement_cols = pickle.load(open('./res/03_gather_outputs/binary_agreement_cols.pkl', 'rb'))
-categorical_agreement_cols = pickle.load(open('./res/03_gather_outputs/categorical_agreement_cols.pkl', 'rb'))
-perfect_only_categorical_agreement_cols = pickle.load(open('./res/03_gather_outputs/perfect_only_categorical_agreement_cols.pkl', 'rb'))
+manual_cell_type_col = pickle.load(open('./res/04_postprocess_results/manual_cell_type_col.pkl', 'rb'))
+llm_celltype_cols = pickle.load(open('./res/04_postprocess_results/llm_celltype_cols.pkl', 'rb'))
+binary_agreement_cols = pickle.load(open('./res/04_postprocess_results/binary_agreement_cols.pkl', 'rb'))
+categorical_agreement_cols = pickle.load(open('./res/04_postprocess_results/categorical_agreement_cols.pkl', 'rb'))
+perfect_only_categorical_agreement_cols = pickle.load(open('./res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl', 'rb'))
 
 #plot model binary agreement overall
 agreement_plot_overall_binary = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=binary_agreement_cols, granularity=0)
@@ -78,10 +78,10 @@ perfect_only_categorical_agreement_cols_top_models = ['perfect_only_categorical_
 llm_celltype_cols_top_models = [col.replace('binary_agreement_consistent_including_manual_' + manual_cell_type_col + '_', '') for col in binary_agreement_cols_top_models]
 
 # Write these model cols for later use
-pickle.dump(binary_agreement_cols_top_models, open('./res/04_figure_2_and_table_2/binary_agreement_cols_top_models.pkl', 'wb'))
-pickle.dump(categorical_agreement_cols_top_models, open('./res/04_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl', 'wb'))
-pickle.dump(perfect_only_categorical_agreement_cols_top_models, open('./res/04_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl', 'wb'))
-pickle.dump(llm_celltype_cols_top_models, open('./res/04_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'wb'))
+pickle.dump(binary_agreement_cols_top_models, open('./res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl', 'wb'))
+pickle.dump(categorical_agreement_cols_top_models, open('./res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl', 'wb'))
+pickle.dump(perfect_only_categorical_agreement_cols_top_models, open('./res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl', 'wb'))
+pickle.dump(llm_celltype_cols_top_models, open('./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'wb'))
 
 
 # Get the tick labels and define custom ones
@@ -92,7 +92,7 @@ customize_figure(agreement_plot_overall_binary, remove_legend = True, x_tick_sub
                  new_tick_labels=model_tick_labels)
 
  #Save the plot as an SVG file
-agreement_plot_overall_binary[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_binary.svg', format='svg')
+agreement_plot_overall_binary[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg', format='svg')
 
 # Example usage (assuming fig_tuple is the figure/axes tuple):
 # html_table = extract_table_to_html(fig_tuple)
@@ -104,7 +104,7 @@ agreement_table_overall_binary = extract_table_from_fig(agreement_plot_overall_b
 # Same plot as above but unweighted
 agreement_plot_overall_binary_unweighted = plot_model_agreement_unweighted(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=binary_agreement_cols, granularity=0)
 customize_figure(agreement_plot_overall_binary_unweighted, remove_legend = True, x_tick_substrings=['binary_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (yes/no)', new_tick_labels=model_tick_labels)
-agreement_plot_overall_binary_unweighted[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg', format='svg')
+agreement_plot_overall_binary_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg', format='svg')
 
 # Get info as a table
 agreement_table_overall_binary_unweighted = extract_table_from_fig(agreement_plot_overall_binary_unweighted, value_col_name="Overall Binary (% of Cell Types)")
@@ -113,7 +113,7 @@ agreement_table_overall_binary_unweighted = extract_table_from_fig(agreement_plo
 #plot the model categorical agreement overall (perfect only)
 agreement_plot_overall_categorical_perfect = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=perfect_only_categorical_agreement_cols, granularity=0)
 customize_figure(agreement_plot_overall_categorical_perfect, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
-agreement_plot_overall_categorical_perfect[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg', format='svg')
+agreement_plot_overall_categorical_perfect[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg', format='svg')
 
 agreement_table_overall_categorical_perfect = extract_table_from_fig(agreement_plot_overall_categorical_perfect, value_col_name="Perfect Match (% of Cells)")
 
@@ -125,7 +125,7 @@ customize_figure(agreement_plot_overall_categorical, remove_legend = True,
                  fig_width=2.4,
                  fig_height=3,
                  new_tick_labels=model_tick_labels)
-agreement_plot_overall_categorical[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_categorical.svg', format='svg')
+agreement_plot_overall_categorical[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg', format='svg')
 
 #unweighted versions of the plots
 #(perfect only)
@@ -137,8 +137,8 @@ agreement_plot_overall_categorical_unweighted = plot_model_agreement_categorical
 customize_figure(agreement_plot_overall_categorical_perfect_unweighted, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
 customize_figure(agreement_plot_overall_categorical_unweighted, remove_legend = True, x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (by level of agreement)', remove_bar_labels=True, fig_width=2.4, fig_height=3, new_tick_labels=model_tick_labels)
 
-agreement_plot_overall_categorical_perfect_unweighted[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg', format='svg')
-agreement_plot_overall_categorical_unweighted[0].savefig('./res/04_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg', format='svg')
+agreement_plot_overall_categorical_perfect_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg', format='svg')
+agreement_plot_overall_categorical_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg', format='svg')
 
 # Extract Table
 agreement_table_categorical_perfect = extract_table_from_fig(agreement_plot_overall_categorical_perfect_unweighted, value_col_name="Perfect Match (% of Cell Types)")
@@ -197,14 +197,14 @@ kappa_clustermap = customize_clustermap(kappa_clustermap, remove_legend=True, x_
                                         y_tick_substrings=['consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='', fig_width=3, fig_height=3.7, remove_value_labels=True,
                                         new_tick_labels=model_tick_labels)
 
-kappa_clustermap[0].savefig('./res/04_figure_2_and_table_2/kappa_clustermap_overall.svg', format='svg')
+kappa_clustermap[0].savefig('./res/05_figure_2_and_table_2/kappa_clustermap_overall.svg', format='svg')
 
 # same info as table, but as a bar plot
 average_pairwise_kappa = plot_average_pairwise_barchart(kappa)
 customize_figure(average_pairwise_kappa, remove_legend = True, x_tick_substrings=['consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Average Kappa', new_tick_labels=model_tick_labels)
 
 #reformat plot and save
-average_pairwise_kappa[0].savefig('./res/04_figure_2_and_table_2/average_pairwise_kappa.svg', format='svg')
+average_pairwise_kappa[0].savefig('./res/05_figure_2_and_table_2/average_pairwise_kappa.svg', format='svg')
 
 # Extract Table
 kappa_table = extract_table_from_fig(average_pairwise_kappa, value_col_name="Average Kappa with Other LLMs", make_percent=False)
@@ -247,5 +247,5 @@ html_content = f'''
 '''
 
 # Write the modified HTML content to a file
-with open("./res/04_figure_2_and_table_2/performance_table.html", "w", encoding="utf-8") as file:
+with open("./res/05_figure_2_and_table_2/performance_table.html", "w", encoding="utf-8") as file:
     file.write(html_content)
