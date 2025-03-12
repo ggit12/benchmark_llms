@@ -33,7 +33,7 @@ from src import (
 # Process the labels
 #Configure the backend to work with a specific provider and model
 provider = os.environ['PROVIDER_FOR_DOWNSTREAM_ANALYSIS']
-llm_config = {provider: PROVIDERS[provider]}
+llm_config = PROVIDERS[provider].copy()
 llm_config['model'] = os.environ['MODEL_FOR_DOWNSTREAM_ANALYSIS']
 
 adt.configure_llm_backend(**llm_config)
