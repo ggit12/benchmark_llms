@@ -39,6 +39,7 @@ conda create -n benchmark_llms python=3.12
 conda activate benchmark_llms
 conda install -c conda-forge tbb numba
 pip install -r requirements.txt
+conda install -c conda-forge firefox geckodriver
 ```
 
 ## Pipeline Execution
