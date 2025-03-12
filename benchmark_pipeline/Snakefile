@@ -189,7 +189,7 @@ rule o5_figure_2_and_table_2:
         'res/05_figure_2_and_table_2/performance_table.html',
     resources:
         partition="cpu",
-        mem="400G",
+        mem="600G",
         cpus=30,
         runtime=300,
         ntasks=1,
@@ -204,7 +204,7 @@ rule o6_figure_s1:
         "res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
     resources:
         partition="cpu",
-        mem="400G",
+        mem="600G",
         cpus=30,
         runtime=60,
         ntasks=1,
@@ -233,7 +233,7 @@ rule o7_figure_3_and_s2:
         "res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
     resources:
         partition="cpu",
-        mem="400G",
+        mem="600G",
         cpus=30,
         runtime=60,
         ntasks=1,
@@ -255,7 +255,7 @@ rule o8_figure_4:
         'res/08_figure_4/agreement_weights_df.pkl',
     resources:
         partition="cpu",
-        mem="400G",
+        mem="600G",
         cpus=30,
         time=120,
         ntasks=1,
@@ -277,7 +277,7 @@ rule o9_figure_5:
         'res/09_figure_5/dendritic_module_umap_in_phagocytes.svg',
     resources:
         partition="cpu",
-        mem="400G",
+        mem="600G",
         cpus=30,
         runtime=60,
         ntasks=1,
