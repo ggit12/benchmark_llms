@@ -275,8 +275,8 @@ basal_genes = ["KRT5", "KRT14", "TP63"]  # Basal Cell Markers
 
 
 # Filter gene lists to include only genes present in the dataset for 'epithelial' and 'basal' cells
-epithelial_genes_filtered = filter_gene_list(epithelial_genes, test)
-basal_genes_filtered = filter_gene_list(basal_genes, test)
+epithelial_genes_filtered = filter_gene_list(test, epithelial_genes,)
+basal_genes_filtered = filter_gene_list(test, basal_genes)
 # keratinocyte_genes_filtered = adt.filter_gene_list(keratinocyte_genes, test)
 
 # Print filtered gene lists (optional)
@@ -384,8 +384,8 @@ stromal_genes = ["DCN", "LUM"]
 
 
 # Filter gene lists to include only genes present in the dataset for 'stromal' and 'granulosa'
-granulosa_genes_filtered = filter_gene_list(granulosa_genes, test_ov)
-stromal_genes_filtered = filter_gene_list(stromal_genes, test_ov)
+granulosa_genes_filtered = filter_gene_list(test_ov, granulosa_genes,)
+stromal_genes_filtered = filter_gene_list(test_ov, stromal_genes)
 
 # Print filtered gene lists (optional)
 print("Granulosa genes used:", granulosa_genes_filtered)
