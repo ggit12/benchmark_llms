@@ -25,6 +25,8 @@ import scanpy as sc
 import matplotlib
 import matplotlib.pyplot as plt
 
+from anndict.utils.anndata_ import filter_gene_list
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -188,9 +190,9 @@ monocyte_genes = gene_lists['Monocyte_Markers']  + ['CD14']
 dendritic_genes = gene_lists['Dendritic_Cell_Markers']
 
 # Filter gene lists to include only genes present in the dataset
-macrophage_genes_filtered = adt.filter_gene_list(adata_temp[('mononuclear phagocyte',)], macrophage_genes)
-monocyte_genes_filtered = adt.filter_gene_list(adata_temp[('mononuclear phagocyte',)], monocyte_genes)
-dendritic_genes_filtered = adt.filter_gene_list(adata_temp[('mononuclear phagocyte',)], dendritic_genes)
+macrophage_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], macrophage_genes)
+monocyte_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], monocyte_genes)
+dendritic_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], dendritic_genes)
 
 # Print filtered gene lists (optional)
 print('Macrophage genes used:', macrophage_genes_filtered)
