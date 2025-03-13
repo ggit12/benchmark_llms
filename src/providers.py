@@ -10,24 +10,21 @@ from typing import Optional
 class ProviderConfig(dict):
     """Configuration settings for a language model provider"""
     provider: str
-    api_key: str
     requests_per_minute: Optional[int] = None
     extra_params: dict[str, str] = field(default_factory=dict)
 
-    def __init__(self, provider: str, api_key: str, requests_per_minute: Optional[int] = None, 
+    def __init__(self, provider: str, requests_per_minute: Optional[int] = None,
                  extra_params: dict[str, str] = None):
         # Initialize the dict
         super().__init__()
 
         # Set dataclass fields
         self.provider = provider
-        self.api_key = api_key
         self.requests_per_minute = requests_per_minute
         self.extra_params = extra_params or {}
 
         # Populate dictionary values
         self['provider'] = provider
-        self['api_key'] = api_key
         if requests_per_minute is not None:
             self['requests_per_minute'] = requests_per_minute
 
@@ -42,17 +39,25 @@ class ProviderEndpoints:
 
 # Define providers
 PROVIDERS = {
-    "openai": ProviderConfig("openai", os.getenv("OPENAI_API_KEY"), 9950),
-    "anthropic": ProviderConfig("anthropic", os.getenv("ANTHROPIC_API_KEY"), 300),
-    "google": ProviderConfig("google", os.getenv("GOOGLE_API_KEY"), 200),
-    "huggingface": ProviderConfig("huggingface", os.getenv("HUGGINGFACE_API_KEY")),
+    "openai": ProviderConfig("openai", 9950, {"api_key": os.getenv("OPENAI_API_KEY")}),
+    "anthropic": ProviderConfig("anthropic", 300, {"api_key": os.getenv("ANTHROPIC_API_KEY")}),
+    "google": ProviderConfig("google", 200, {"api_key": os.getenv("GOOGLE_API_KEY")}),
+    "huggingface": ProviderConfig("huggingface", {"api_key": os.getenv("HUGGINGFACE_API_KEY")}),
     "azureml_endpoint": ProviderConfig(
-        "azureml_endpoint", os.getenv("AZUREML_API_KEY"), None,
-        {"endpoint_name": "your-endpoint-name", "region": "your-region"}
+        "azureml_endpoint", None,
+        {
+            "api_key": os.getenv("AZUREML_API_KEY"),
+            "endpoint_name": "your-endpoint-name",
+            "region": "your-region"
+        }
     ),
     "bedrock": ProviderConfig(
-        "bedrock", os.getenv("BEDROCK_API_KEY"), 30,
-        {"region_name": "us-west-2", "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID")}
+        "bedrock", 30,
+        {
+            "region_name": "us-west-2",
+            "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
+            "aws_secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY")
+        }
     ),
 }
 
