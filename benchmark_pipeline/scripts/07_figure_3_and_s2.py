@@ -223,6 +223,14 @@ adt.wrappers.save_sankey_adata_dict(
     filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells.svg",  # Dynamic filename for each plot
 )
 
+# Write a done file for the above sankey plots
+with open(
+    "./res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done",
+    "w", encoding="utf-8",
+) as f:
+    f.write("done")
+
+
 # Above might fail for basal cells, so do:
 sankey_ai_to_man_basal_cells = adt.plot_sankey(
     adata_top_left_cells[("Basal Cell",)],

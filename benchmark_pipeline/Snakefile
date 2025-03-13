@@ -223,7 +223,7 @@ rule o7_figure_3_and_s2:
         "res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         "res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
         # These files below won't run unless on the bigger object
-        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells.svg",
+        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done", # Uses a done file because the file name here is a template and is dynamically modified for each cell type
         "res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
         "res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
         "res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
