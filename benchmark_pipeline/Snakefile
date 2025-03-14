@@ -189,8 +189,8 @@ rule o5_figure_2_and_table_2:
         'res/05_figure_2_and_table_2/performance_table.html',
     resources:
         partition="cpu",
-        mem="800G",
-        cpus=30,
+        mem="1000G",
+        # cpus=30,
         runtime=300,
         ntasks=1,
     shell:
