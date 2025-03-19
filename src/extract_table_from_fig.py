@@ -41,14 +41,15 @@ def extract_table_from_fig(
     # Get legend handles and labels (assume they match up, in order, with the bar containers)
     _, labels = ax.get_legend_handles_labels()
 
+    # Handle empty labels (i.e. when labels is `[]`)
+    if not labels:
+        labels = [f"container_{i+1}" for i in range(len(ax.containers))]
+
     # Prepare a dict starting with the 'Model' column
     data_dict = {"Model": xtick_labels}
 
     # Zip the containers and legend labels, then iterate over them
     for label, container in zip(labels, ax.containers):
-        # Use a fallback if the label was never set (or is _nolegend_)
-        if not label or label == "_nolegend_":
-            label = value_col_name
 
         # Extract bar heights
         heights = [bar_i.get_height() for bar_i in container]
