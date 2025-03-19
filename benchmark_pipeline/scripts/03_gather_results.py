@@ -28,7 +28,7 @@ print("Loaded results", flush=True)
 
 # Load the adata_dict
 print("Loading adata_dict", flush=True)
-adata_dict = adt.read_adata_dict('./dat/preprocessed_tissue_adt_ts2')
+adata_dict = adt.read_adata_dict('../../dat/preprocessed_tissue_adt_ts2')
 print("Loaded adata_dict", flush=True)
 
 def merge_obs_to_adata(adata_dict, results):

@@ -207,14 +207,32 @@ customize_figure(average_pairwise_kappa, remove_legend = True, x_tick_substrings
 average_pairwise_kappa[0].savefig('./res/05_figure_2_and_table_2/average_pairwise_kappa.svg', format='svg')
 
 # Extract Table
-kappa_table = extract_table_from_fig(average_pairwise_kappa, value_col_name="Average Kappa with Other LLMs", make_percent=False)
+kappa_table = extract_table_from_fig(average_pairwise_kappa, value_col_name="Average Kappa with Other LLMs")
 
 
 #merge all the value tables
 performance_table = pd.concat([agreement_table_overall_binary, agreement_table_overall_binary_unweighted, agreement_table_overall_categorical_perfect, agreement_table_categorical_perfect, kappa_with_manual_df, kappa_table], axis=1)
 
-# Assuming your DataFrame is named performance_table and 'Model' is set as the index
-performance_table_for_html = performance_table.copy()  # Create a copy of performance_table
+# Write the performance table as .pkl for later aggregation
+performance_table.to_pickle('./res/05_figure_2_and_table_2/performance_table.pkl')
+
+# Create a copy of performance_table
+performance_table_for_html = performance_table.copy()
+
+# Format the values in the table as percentages and/or round
+format_as_percent = ['Overall Binary (% of Cells)', 'Overall Binary (% of Cell Types)', 'Perfect Match (% of Cells)', 'Perfect Match (% of Cell Types)']
+format_as_rounded = ['Kappa with Manual Annotations', 'Average Kappa with Other LLMs']
+
+for col in format_as_percent:
+    performance_table_for_html[col] = performance_table_for_html[col].apply(lambda x: f"{x:.2%}")
+
+for col in format_as_rounded:
+    performance_table_for_html[col] = performance_table_for_html[col].apply(lambda x: f"{x:.3f}")
+
+# Drop extra columns
+for col in performance_table_for_html.columns:
+    if col not in format_as_percent + format_as_rounded:
+        performance_table_for_html.drop(col, axis=1, inplace=True)
 
 # Reset the index on the copy to make 'Model' a column
 performance_table_for_html.reset_index(inplace=True)

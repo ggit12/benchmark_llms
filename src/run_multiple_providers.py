@@ -55,7 +55,7 @@ def process_adata_dict(
     adt.configure_llm_backend(**llm_config)
 
     #Extract model name from the config
-    model = llm_config['model'] 
+    model = llm_config['model']
 
     #Determine appropriate cluster resolutions using AI
     #This will leave the final column as 'leiden' in the .obs of each anndata
