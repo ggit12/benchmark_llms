@@ -32,6 +32,7 @@ from .format_fig import (
     customize_clustermap,
     customize_scatterplot,
     replace_tick_labels,
+    customize_legend_labels,
 )
 
 from .agreement_plots import (
@@ -81,6 +82,7 @@ __all__ = [
     "customize_clustermap",
     "customize_scatterplot",
     "replace_tick_labels",
+    "customize_legend_labels",
 
     # agreement_plots
     "plot_model_agreement_unweighted",

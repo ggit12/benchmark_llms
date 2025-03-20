@@ -6,7 +6,8 @@ import pandas as pd
 
 def extract_table_from_fig(
     fig_tuple: tuple,
-    value_col_name: str | None = None
+    value_col_name: str | None = None,
+    x_tick_label_name: str = "Model",
 ) -> pd.DataFrame:
     """
     Extracts data from a bar plot and returns it as a pandas :class:`DataFrame`.
@@ -46,7 +47,7 @@ def extract_table_from_fig(
         labels = [f"container_{i+1}" for i in range(len(ax.containers))]
 
     # Prepare a dict starting with the 'Model' column
-    data_dict = {"Model": xtick_labels}
+    data_dict = {x_tick_label_name: xtick_labels}
 
     # Zip the containers and legend labels, then iterate over them
     for label, container in zip(labels, ax.containers):
@@ -59,5 +60,5 @@ def extract_table_from_fig(
         data_dict[column_name] = heights
 
     # Create the DataFrame
-    df = pd.DataFrame(data_dict).set_index("Model")
+    df = pd.DataFrame(data_dict).set_index(x_tick_label_name)
     return df

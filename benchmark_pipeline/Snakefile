@@ -7,6 +7,7 @@ To add a new model for an existing provider, just add it to ENDPOINTS in provide
 
 import os
 import sys
+from itertools import product
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -16,29 +17,49 @@ sys.path.append(source_dir)
 
 from src import PROVIDERS, ENDPOINTS
 
+# Number of benchmark runs to perform
+N_RUNS = int(os.environ["N_RUNS"])
+
+# Define run directories
+RUN_DIRS = [f"run_{i+1}" for i in range(N_RUNS)]
+
+# Main rule to generate all outputs including aggregated results
 rule all:
     input:
+        #Where rules have multiple outputs, only the last output is used
+        # Original outputs for each run
+        # ------------------------------
         #to trigger o1, o2, o3, o4, o5, o8, o9
-        'res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
-
+        expand("res/{run}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg", run=RUN_DIRS),
         #to trigger o6
-        "res/06_figure_s1/done",
-
+        expand("res/{run}/res/06_figure_s1/done", run=RUN_DIRS),
         #to trigger o7
-        "res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        expand("res/{run}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", run=RUN_DIRS),
         # These files below won't run unless on the bigger object
-        "res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+        expand("res/{run}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", run=RUN_DIRS),
 
-# rule all:
-#     input:
-#         'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+        # Final aggregated results
+        # -------------------------
+        #to trigger o10
+        "res/10_aggregated_tables/aggregated_performance_table.html",
+
+        #to trigger o11
+        "res/11_aggregated_kappa/kappa_sd.svg",
+
+        #to trigger o12
+        "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
+
+        #to trigger o13
+        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
 
 
+# Preprocess rule - only run once
 rule o1_preprocess_ts2:
     input:
         os.environ["INPUT_DATA"]
     output:
-        directory("dat/preprocessed_tissue_adt_ts2")
+        directory("dat/preprocessed_tissue_adt_ts2"),
+        'dat/manual_cell_type_col.pkl',
     resources: # sbatch flag to which snakemake maps
         partition="cpu", # --partition
         mem="800G", # --mem
@@ -48,238 +69,292 @@ rule o1_preprocess_ts2:
     shell:
         "python scripts/01_preprocess_ts2.py"
 
+# Define rules for each run
+for run_dir in RUN_DIRS:
+    # Provider rules for each run
+    for provider in ENDPOINTS.endpoints.keys():
+        rule:
+            name: f"o2_run_{provider}_{run_dir}"
+            input:
+                "dat/preprocessed_tissue_adt_ts2"  # Use the same preprocessed data for all runs
+            output:
+                expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
+                       run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
+            group: provider # Implicitly sets provider concurrency limit because by defauly, `snakemake --max-jobs-per-group` is `1`
+            resources:
+                partition="cpu",
+                mem="600G",
+                # cpus=30,
+                runtime=480,
+                ntasks=1,
+            params:
+                provider=provider,
+                run=run_dir,
+            shell:
+                """
+                mkdir -p res/{params.run} && \
+                cd res/{params.run} && \
+                python ../../scripts/02_run_provider.py --provider {params.provider} --input ../../dat/preprocessed_tissue_adt_ts2 --outdir res/02_run_provider
+                """
 
-rule o2_run_openai:
+    # Gather results for all providers and models
+    rule:
+        name: f"o3_gather_results_{run_dir}"
+        input:
+            [f"res/{run_dir}/res/02_run_provider/{provider}_{model}.pkl" 
+                    for provider, models in ENDPOINTS.endpoints.items()
+                    for model in models]
+        output:
+            f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
+        resources:
+            partition="cpu",
+            mem="800G",
+            # cpus=30,
+            runtime=300,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/03_gather_results.py
+            """
+
+    # Postprocess the results
+    rule:
+        name: f"o4_postprocess_results_{run_dir}"
+        input:
+            f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
+        output:
+            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
+        resources:
+            partition="cpu",
+            mem="600G",
+            runtime=300,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/04_postprocess_results.py
+            """
+
+    # Rule for figure 2 and table 2
+    rule:
+        name: f"o5_figure_2_and_table_2_{run_dir}"
+        input:
+            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad'
+        output:
+            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/kappa.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.html',
+        resources:
+            partition="cpu",
+            mem="1000G",
+            runtime=300,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/05_figure_2_and_table_2.py
+            """
+
+    # Rule for figure S1
+    rule:
+        name: f"o6_figure_s1_{run_dir}"
+        input:
+            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl'
+        output:
+            f"res/{run_dir}/res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+        resources:
+            partition="cpu",
+            mem="600G",
+            cpus=30,
+            runtime=60,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/06_figure_s1.py
+            """
+
+    # Rule for figure 3 and S2
+    rule:
+        name: f"o7_figure_3_and_s2_{run_dir}"
+        input:
+            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl'
+        output:
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes.pkl",
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes_perfect_only.pkl",
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done",  # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
+            f"res/{run_dir}/res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
+            # These files below won't run unless on the bigger object
+            f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done",
+            f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg"
+        resources:
+            partition="cpu",
+            mem="600G",
+            cpus=30,
+            runtime=60,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/07_figure_3_and_s2.py
+            """
+
+    # Rule for figure 4
+    rule:
+        name: f"o8_figure_4_{run_dir}"
+        input:
+            f'dat/manual_cell_type_col.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f"res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl",
+            f"res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
+            f"res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
+            f"res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl"
+        output:
+            f'res/{run_dir}/res/08_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
+            f'res/{run_dir}/res/08_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
+            f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
+            f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
+        resources:
+            partition="cpu",
+            mem="600G",
+            cpus=30,
+            time=120,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/08_figure_4.py
+            """
+
+    # Rule for figure 5
+    rule:
+        name: f"o9_figure_5_{run_dir}"
+        input:
+            f"res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad",
+            f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
+            f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
+        output:
+            f'res/{run_dir}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
+            # f'res/{run_dir}/res/09_figure_5/sankey_topleft_of_agreement.svg',
+            # These files below won't run unless on the bigger object
+            f'res/{run_dir}/res/09_figure_5/gene_module_scores_in_phagocytes.svg',
+            f'res/{run_dir}/res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',
+            f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
+            f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
+        resources:
+            partition="cpu",
+            mem="600G",
+            cpus=30,
+            runtime=60,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/09_figure_5.py
+            """
+
+rule o10_aggregate_tables:
     input:
-        "dat/preprocessed_tissue_adt_ts2"
+        expand("res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl", run_dir=RUN_DIRS),
     output:
-        expand("res/02_run_provider/{provider}_{model}.pkl", provider="openai", model=ENDPOINTS.endpoints["openai"])
+        "res/10_aggregated_tables/aggregated_performance_table_mean.pkl",
+        "res/10_aggregated_tables/aggregated_performance_table_std.pkl",
+        "res/10_aggregated_tables/aggregated_performance_table.html",
     resources:
         partition="cpu",
-        mem="600G",
-        # cpus=30,
-        runtime=480,
-        ntasks=1,
-    params:
-        provider="openai",
-        outdir="res/02_run_provider"
-    shell:
-        "python scripts/02_run_provider.py \
-        --provider {params.provider} \
-        --input {input} \
-        --outdir {params.outdir}"
-
-rule o2_run_anthropic:
-    input:
-        "dat/preprocessed_tissue_adt_ts2"
-    output:
-        expand("res/02_run_provider/{provider}_{model}.pkl", provider="anthropic", model=ENDPOINTS.endpoints["anthropic"])
-    resources:
-        partition="cpu",
-        mem="600G",
-        # cpus=30,
-        runtime=480,
-        ntasks=1,
-    params:
-        provider="anthropic",
-        outdir="res/02_run_provider"
-    shell:
-        "python scripts/02_run_provider.py \
-        --provider {params.provider} \
-        --input {input} \
-        --outdir {params.outdir}"
-
-rule o2_run_bedrock:
-    input:
-        "dat/preprocessed_tissue_adt_ts2"
-    output:
-        expand("res/02_run_provider/{provider}_{model}.pkl", provider="bedrock", model=ENDPOINTS.endpoints["bedrock"])
-    resources:
-        partition="cpu",
-        mem="600G",
-        # cpus=30,
-        runtime=480,
-        ntasks=1,
-    params:
-        provider="bedrock",
-        outdir="res/02_run_provider"
-    shell:
-        "python scripts/02_run_provider.py \
-        --provider {params.provider} \
-        --input {input} \
-        --outdir {params.outdir}"
-
-rule o2_run_google:
-    input:
-        "dat/preprocessed_tissue_adt_ts2"
-    output:
-        expand("res/02_run_provider/{provider}_{model}.pkl", provider="google", model=ENDPOINTS.endpoints["google"])
-    resources:
-        partition="cpu",
-        mem="600G",
-        # cpus=30,
-        runtime=480,
-        ntasks=1,
-    params:
-        provider="google",
-        outdir="res/02_run_provider"
-    shell:
-        "python scripts/02_run_provider.py \
-        --provider {params.provider} \
-        --input {input} \
-        --outdir {params.outdir}"
-
-# Aggregate the results
-rule o3_gather_results:
-    input:
-        [f"res/02_run_provider/{provider}_{model}.pkl" 
-                for provider, models in ENDPOINTS.endpoints.items()
-                for model in models]
-        # [f"res/02_run_provider/openai_{model}.pkl" for model in ENDPOINTS.endpoints["openai"]]
-    output:
-        'res/03_gather_results/ts2_de_novo_llm_annotated.h5ad',
-    resources:
-        partition="cpu",
-        mem="800G",
-        # cpus=30,
-        runtime=300,
-        ntasks=1,
-    shell:
-        "python scripts/03_gather_results.py"
-
-# Aggregate the results
-rule o4_postprocess_results:
-    input:
-        'res/03_gather_results/ts2_de_novo_llm_annotated.h5ad',
-    output:
-        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
-        'res/04_postprocess_results/label_map_with_manual.pkl',
-        'res/04_postprocess_results/label_agreement_binary.pkl',
-        'res/04_postprocess_results/label_agreement_categorical.pkl',
-        'res/04_postprocess_results/manual_cell_type_col.pkl',
-        'res/04_postprocess_results/llm_celltype_cols.pkl',
-        'res/04_postprocess_results/binary_agreement_cols.pkl',
-        'res/04_postprocess_results/categorical_agreement_cols.pkl',
-        'res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
-    resources:
-        partition="cpu",
-        mem="600G",
-        # cpus=30,
-        runtime=300,
-        ntasks=1,
-    shell:
-        "python scripts/04_postprocess_results.py"
-
-rule o5_figure_2_and_table_2:
-    input:
-        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad'
-    output:
-        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
-        'res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
-        'res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
-        'res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
-        'res/05_figure_2_and_table_2/performance_table.html',
-    resources:
-        partition="cpu",
-        mem="1000G",
-        # cpus=30,
-        runtime=300,
-        ntasks=1,
-    shell:
-        "python scripts/05_figure_2_and_table_2.py"
-
-rule o6_figure_s1:
-    input:
-        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
-        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
-    output:
-        "res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
-    resources:
-        partition="cpu",
-        mem="600G",
-        cpus=30,
+        mem="32G",
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/06_figure_s1.py"
+        "python scripts/10_aggregate_tables.py --input-tables {input}"
 
-rule o7_figure_3_and_s2:
+rule o11_aggregate_kappa:
     input:
-        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
-        'res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
-        'res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
+        expand("res/{run_dir}/res/05_figure_2_and_table_2/kappa.pkl", run_dir=RUN_DIRS),
     output:
-        "res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
-        "res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
-        "res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
-        "res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
-        # These files below won't run unless on the bigger object
-        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done", # Uses a done file because the file name here is a template and is dynamically modified for each cell type
-        "res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
-        "res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
-        "res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
-        "res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
-        "res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
-        "res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
-        "res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+        "res/11_aggregated_kappa/kappa_mean.pkl",
+        "res/11_aggregated_kappa/kappa_sd.pkl",
+        "res/11_aggregated_kappa/kappa_mean.svg",
+        "res/11_aggregated_kappa/kappa_sd.svg",
     resources:
         partition="cpu",
-        mem="600G",
-        cpus=30,
+        mem="32G",
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/07_figure_3_and_s2.py"
+        "python scripts/11_aggregate_kappa.py --input-kappas {input}"
 
-rule o8_figure_4:
+rule o12_aggregate_agreement_plots:
     input:
-        'res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
-        "res/04_postprocess_results/manual_cell_type_col.pkl",
-        "res/04_postprocess_results/llm_celltype_cols.pkl",
-        "res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
-        "res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
-        "res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl",
+        expand("res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl", run_dir=RUN_DIRS),
     output:
-        'res/08_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
-        'res/08_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
-        'res/08_figure_4/agreement_df.pkl',
-        'res/08_figure_4/agreement_weights_df.pkl',
+        "res/12_aggregated_agreement_plots/agreement_plot_categorical.svg",
+        "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
     resources:
         partition="cpu",
-        mem="600G",
-        cpus=30,
-        time=120,
-        ntasks=1,
+        mem="32G",
+        runtime=60,
+        ntasks=1
     shell:
-        "python scripts/08_figure_4.py"
+        """
+        python scripts/12_aggregate_agreement_plots.py \
+        --input-tables {input}
+        """
 
-rule o9_figure_5:
+rule o13_aggregate_agreement_plots_largest_celltypes:
     input:
-        "res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad",
-        'res/08_figure_4/agreement_df.pkl',
-        'res/08_figure_4/agreement_weights_df.pkl',
+        tables=expand("res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes.pkl", run_dir=RUN_DIRS),
+        tables_perfect_only=expand("res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes_perfect_only.pkl", run_dir=RUN_DIRS),
     output:
-        'res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
-        # 'res/09_figure_5/sankey_topleft_of_agreement.svg',
-        # These files below won't run unless on the bigger object
-        'res/09_figure_5/gene_module_scores_in_phagocytes.svg',
-        'res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',
-        'res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
-        'res/09_figure_5/dendritic_module_umap_in_phagocytes.svg',
+        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes.svg",
+        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
     resources:
         partition="cpu",
-        mem="600G",
-        cpus=30,
+        mem="32G",
         runtime=60,
         ntasks=1,
     shell:
-        "python scripts/09_figure_5.py"
+        """
+        python scripts/13_aggregate_agreement_plots_largest_celltypes.py \
+            --input-tables {input.tables} \
+            --input-tables-perfect-only {input.tables_perfect_only} \
+        """

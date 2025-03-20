@@ -6,3 +6,4 @@ python-dotenv
 adjustText
 igraph
 leidenalg
+sigfig

@@ -28,6 +28,7 @@ adata_dict = adt.read_adata_dict(args.input)
 all_models = ENDPOINTS.endpoints[args.provider]
 
 # Check outdir to see which models have already been run
+os.makedirs(args.outdir, exist_ok=True)
 completed_models = [
     f.replace(".pkl", "").replace(f"{args.provider}_", "")
     for f in os.listdir(args.outdir)
@@ -55,8 +56,6 @@ provider_config = {args.provider: PROVIDERS[args.provider]}
 results = run_multiple_providers_models(
     adata_dict, provider_endpoint_dict, provider_config
 )
-
-os.makedirs(args.outdir, exist_ok=True)
 
 # Write out separate pickle file for each model
 for model in model_list:

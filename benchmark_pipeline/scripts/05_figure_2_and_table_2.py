@@ -12,6 +12,10 @@ Files saved:
 8. './res/05_figure_2_and_table_2/average_pairwise_kappa.svg'
 9. './res/05_figure_2_and_table_2/performance_table.html'
 
+Note: "unweighted" means that the cell types have not been weighted by their size (number of cells), 
+while "weighted" means that the metric reflects the proportion of cells in total (not cell types). 
+The "weighted" suffix is dropped in the code below, 
+only "unweighted" is used (so the absence of "unweighted" means "weighted").
 """
 # pylint: disable=line-too-long
 # pylint: disable=redefined-outer-name
@@ -53,7 +57,7 @@ matplotlib.use('Agg')
 adata = sc.read_h5ad('./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad')
 
 # And the various column names
-manual_cell_type_col = pickle.load(open('./res/04_postprocess_results/manual_cell_type_col.pkl', 'rb'))
+manual_cell_type_col = pickle.load(open('../../dat/manual_cell_type_col.pkl', 'rb'))
 llm_celltype_cols = pickle.load(open('./res/04_postprocess_results/llm_celltype_cols.pkl', 'rb'))
 binary_agreement_cols = pickle.load(open('./res/04_postprocess_results/binary_agreement_cols.pkl', 'rb'))
 categorical_agreement_cols = pickle.load(open('./res/04_postprocess_results/categorical_agreement_cols.pkl', 'rb'))
@@ -118,6 +122,7 @@ agreement_plot_overall_categorical_perfect[0].savefig('./res/05_figure_2_and_tab
 agreement_table_overall_categorical_perfect = extract_table_from_fig(agreement_plot_overall_categorical_perfect, value_col_name="Perfect Match (% of Cells)")
 
 #and separated by level of agreement
+#This is Figure 2A
 agreement_plot_overall_categorical = adt.plot_model_agreement_categorical(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=categorical_agreement_cols, granularity=0)
 customize_figure(agreement_plot_overall_categorical, remove_legend = True,
                  x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_simplified_ai_cell_type'],
@@ -127,11 +132,14 @@ customize_figure(agreement_plot_overall_categorical, remove_legend = True,
                  new_tick_labels=model_tick_labels)
 agreement_plot_overall_categorical[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg', format='svg')
 
+agreement_table_overall_categorical = extract_table_from_fig(agreement_plot_overall_categorical, value_col_name="Categorical Agreement (% of Cells)")
+
 #unweighted versions of the plots
 #(perfect only)
 agreement_plot_overall_categorical_perfect_unweighted = plot_model_agreement_unweighted(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=perfect_only_categorical_agreement_cols, granularity=0)
 
 #and separated by level of agreement
+#This is Figure 2B
 agreement_plot_overall_categorical_unweighted = plot_model_agreement_categorical_unweighted(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=categorical_agreement_cols, granularity=0)
 
 customize_figure(agreement_plot_overall_categorical_perfect_unweighted, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_simplified_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
@@ -141,10 +149,14 @@ agreement_plot_overall_categorical_perfect_unweighted[0].savefig('./res/05_figur
 agreement_plot_overall_categorical_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg', format='svg')
 
 # Extract Table
-agreement_table_categorical_perfect = extract_table_from_fig(agreement_plot_overall_categorical_perfect_unweighted, value_col_name="Perfect Match (% of Cell Types)")
+agreement_table_categorical_perfect_unweighted = extract_table_from_fig(agreement_plot_overall_categorical_perfect_unweighted, value_col_name="Perfect Match (% of Cell Types)")
+agreement_table_categorical_unweighted = extract_table_from_fig(agreement_plot_overall_categorical_unweighted, value_col_name="Categorical Agreement (% of Cell Types)")
 
 #calculate kappa
 kappa = adt.kappa_adata(adata, llm_celltype_cols)
+
+# save for later aggregation
+pickle.dump(kappa, open('./res/05_figure_2_and_table_2/kappa.pkl', 'wb'))
 
 # calculate kappa including manual column
 kappa_with_manual = adt.kappa_adata(adata, llm_celltype_cols + ['consistent_including_manual_' + manual_cell_type_col])
@@ -190,6 +202,7 @@ kappa_with_manual_df = extract_kappa_pairs(kappa_with_manual, 'consistent_includ
                                            replace_dict=model_tick_labels)
 
 
+# Figure 2C:
 # plot kappa
 kappa_clustermap = plot_pairwise_clustermap(kappa, metric='cosine', method='centroid')
 
@@ -209,9 +222,16 @@ average_pairwise_kappa[0].savefig('./res/05_figure_2_and_table_2/average_pairwis
 # Extract Table
 kappa_table = extract_table_from_fig(average_pairwise_kappa, value_col_name="Average Kappa with Other LLMs")
 
+#write this for debugging
+kappa_table.to_pickle('./res/05_figure_2_and_table_2/kappa_table.pkl')
 
 #merge all the value tables
-performance_table = pd.concat([agreement_table_overall_binary, agreement_table_overall_binary_unweighted, agreement_table_overall_categorical_perfect, agreement_table_categorical_perfect, kappa_with_manual_df, kappa_table], axis=1)
+performance_table = pd.concat([
+                                agreement_table_overall_binary, agreement_table_overall_binary_unweighted,
+                                agreement_table_overall_categorical_perfect, agreement_table_categorical_perfect_unweighted,
+                                agreement_table_overall_categorical, agreement_table_categorical_unweighted,
+                                kappa_with_manual_df, kappa_table
+                              ], axis=1)
 
 # Write the performance table as .pkl for later aggregation
 performance_table.to_pickle('./res/05_figure_2_and_table_2/performance_table.pkl')
@@ -233,6 +253,8 @@ for col in format_as_rounded:
 for col in performance_table_for_html.columns:
     if col not in format_as_percent + format_as_rounded:
         performance_table_for_html.drop(col, axis=1, inplace=True)
+
+# Table 2 is performance_table_for_html (its value at this point in the code). Below, we write it to an HTML file.
 
 # Reset the index on the copy to make 'Model' a column
 performance_table_for_html.reset_index(inplace=True)

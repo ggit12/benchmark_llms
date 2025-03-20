@@ -33,7 +33,7 @@ adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5a
 
 # And the various column names
 manual_cell_type_col = pickle.load(
-    open("./res/04_postprocess_results/manual_cell_type_col.pkl", "rb")
+    open("../../dat/manual_cell_type_col.pkl", "rb")
 )
 
 binary_agreement_cols_top_models = pickle.load(

@@ -89,6 +89,8 @@ def plot_pairwise_clustermap(
         row_linkage=row_linkage,
         col_linkage=col_linkage,
         cbar_pos=(0.02, 0.8, 0.05, 0.18),
+        vmin=0,
+        vmax=1,
     )
 
     # Color the diagonal grey

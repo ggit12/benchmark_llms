@@ -14,7 +14,5 @@ nbs
 benchmark_pipeline/.snakemake
 
 # Data is too large to get added to repo, but is available online (is the posted Tabula Sapiens 2 full database).
-benchmark_pipeline/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad
-benchmark_pipeline/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad
-benchmark_pipeline/dat
+benchmark_pipeline/**.h5ad
 

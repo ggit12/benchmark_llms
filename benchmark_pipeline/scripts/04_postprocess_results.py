@@ -32,21 +32,11 @@ from src import (
 
 # Process the labels
 #Configure the backend to work with a specific provider and model
-provider = os.environ['PROVIDER_FOR_DOWNSTREAM_ANALYSIS']
+provider = os.environ['PROVIDER_FOR_POST_PROCESSING']
 llm_config = PROVIDERS[provider].copy()
-llm_config['model'] = os.environ['MODEL_FOR_DOWNSTREAM_ANALYSIS']
+llm_config['model'] = os.environ['MODEL_FOR_POST_PROCESSING']
 
 adt.configure_llm_backend(**llm_config)
-
-# adt.configure_llm_backend(provider='anthropic',
-#                           model='claude-3-5-sonnet-20240620',
-#                           api_key=os.environ['ANTHROPIC_API_KEY'],
-#                           requests_per_minute=400
-#                           )
-# adt.configure_llm_backend(provider='openai',
-#                           model='gpt-4o',
-#                           api_key=os.environ['OPENAI_API_KEY'],
-#                           requests_per_minute=9950)
 
 # Read the merged AnnData
 adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
@@ -56,8 +46,9 @@ adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
 # cell_type_cols = adt.get_adata_columns(adata, col_endswith=['ai_cell_sub_type', 'simplified_ai_cell_type'], not_col_startswith=['raw', 'agreement'])
 cell_type_cols = adt.get_adata_columns(adata, ends_with=['simplified_ai_cell_type'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
 
-# Define manual cell type column
-manual_cell_type_col = 'cell_ontology_class'
+# Read manual cell type column
+with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
+    manual_cell_type_col = pickle.load(f)
 
 #unify category labels across all ai annotations and manual annotation.
 label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
@@ -116,7 +107,6 @@ pickle.dump(label_agreement_binary, open(base_path + 'label_agreement_binary.pkl
 pickle.dump(label_agreement_categorical, open(base_path + 'label_agreement_categorical.pkl', 'wb'))
 
 #Write all these
-pickle.dump(manual_cell_type_col, open(base_path + 'manual_cell_type_col.pkl', 'wb'))
 pickle.dump(llm_celltype_cols, open(base_path + 'llm_celltype_cols.pkl', 'wb'))
 pickle.dump(binary_agreement_cols, open(base_path + 'binary_agreement_cols.pkl', 'wb'))
 pickle.dump(categorical_agreement_cols, open(base_path + 'categorical_agreement_cols.pkl', 'wb'))
