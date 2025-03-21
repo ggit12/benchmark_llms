@@ -62,9 +62,7 @@ llm_celltype_cols_top_models = pickle.load(
 
 # get the top 10 cell types by count
 consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
-adata_large_celltypes = adt.wrappers.sample_and_drop_adata_dict(
-    {"adata": adata}, strata_keys=[consistent_manual_cell_type_col], n_largest_groups=10
-)["adata"]
+adata_large_celltypes = adt.sample_and_drop(adata, strata_keys=[manual_cell_type_col], n_largest_groups=10)
 
 
 # Panel A
@@ -73,7 +71,7 @@ adata_large_celltypes = adt.wrappers.sample_and_drop_adata_dict(
 # plot the binary agreement
 agreement_plot_top_celltypes = adt.plot_model_agreement(
     adata_large_celltypes,
-    group_by=consistent_manual_cell_type_col,
+    group_by=manual_cell_type_col,
     sub_group_by="tissue",
     agreement_cols=binary_agreement_cols_top_models,
     granularity=1,
@@ -104,7 +102,7 @@ agreement_table_top_celltypes.to_pickle(
 # plot the perfect match only agreement
 agreement_plot_overall_categorical_perfect_top_celltypes = adt.plot_model_agreement(
     adata_large_celltypes,
-    group_by=consistent_manual_cell_type_col,
+    group_by=manual_cell_type_col,
     sub_group_by="tissue",
     agreement_cols=perfect_only_categorical_agreement_cols_top_models,
     granularity=1,
@@ -141,7 +139,7 @@ agreement_plots_by_tissue_celltype_top_celltypes = []
 for col in binary_agreement_cols_top_models:
     agreement_plot_temp = adt.plot_model_agreement(
         adata_large_celltypes,
-        group_by=consistent_manual_cell_type_col,
+        group_by=manual_cell_type_col,
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
@@ -191,7 +189,7 @@ with open(
 agreement_df_large_celltypes = compute_agreement_df(
     adata_large_celltypes,
     rater_cols=llm_celltype_cols_top_models,
-    manual_col=consistent_manual_cell_type_col,
+    manual_col=manual_cell_type_col,
     agreement_type="plurality",
     normalize_values=False,
 )
@@ -225,7 +223,7 @@ agreement_scatterplot_large_celltypes[0].savefig(
 adata_top_left_cells = adt.build_adata_dict(
     adata_large_celltypes,
     strata_keys=[consistent_manual_cell_type_col],
-    desired_strata=[("Basal Cell",), ("Stromal Cell",)],
+    desired_strata=[("basal cell",), ("stromal cell of ovary",)],
 )
 
 # Panel B and D
@@ -262,7 +260,7 @@ with open(
 
 # Above might fail for basal cells, so do:
 sankey_ai_to_man_basal_cells = adt.plot_sankey(
-    adata_top_left_cells[("Basal Cell",)],
+    adata_top_left_cells[("basal cell",)],
     cols=[manual_cell_type_col]
     + [
         ai_cell_type_col
@@ -279,7 +277,7 @@ adt.save_sankey(
 adata_basal_cells = adt.build_adata_dict(
     adata_large_celltypes,
     strata_keys=[consistent_manual_cell_type_col],
-    desired_strata=[("Basal Cell",), ("Stromal Cell",)],
+    desired_strata=[("basal cell",), ("stromal cell of ovary",)],
 )
 
 # # Panel C
@@ -290,7 +288,7 @@ adata_basal_cells = adt.build_adata_dict(
 # # Step 2: Recalculate the UMAP embedding
 # adt.calculate_umap_adata_dict(test)
 
-test = adata_top_left_cells[("Basal Cell",)].copy()
+test = adata_top_left_cells[("basal cell",)].copy()
 sc.pp.neighbors(test, n_neighbors=15)
 
 # Step 2: Recalculate the UMAP embedding
@@ -406,7 +404,7 @@ basal_fig.savefig(
 
 # Panel E
 
-test_ov = adata_top_left_cells[("Stromal Cell",)].copy()
+test_ov = adata_top_left_cells[("stromal cell of ovary",)].copy()
 
 sc.pp.neighbors(test_ov, n_neighbors=15)
 
