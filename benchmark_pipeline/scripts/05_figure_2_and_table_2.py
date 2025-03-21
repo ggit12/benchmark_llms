@@ -159,7 +159,8 @@ kappa = adt.kappa_adata(adata, llm_celltype_cols)
 pickle.dump(kappa, open('./res/05_figure_2_and_table_2/kappa.pkl', 'wb'))
 
 # calculate kappa including manual column
-kappa_with_manual = adt.kappa_adata(adata, llm_celltype_cols + ['consistent_including_manual_' + manual_cell_type_col])
+consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_type_col
+kappa_with_manual = adt.kappa_adata(adata, llm_celltype_cols + [consistent_manual_cell_type_col])
 
 # calculate alpha
 alpha = adt.krippendorff_alpha_adata(adata, llm_celltype_cols)
@@ -198,7 +199,7 @@ def extract_kappa_pairs(data_dict, column_name, substring_to_remove, replace_dic
 
     return df
 
-kappa_with_manual_df = extract_kappa_pairs(kappa_with_manual, 'consistent_including_manual_' + manual_cell_type_col, substring_to_remove={'consistent_including_manual_':'', '_simplified_ai_cell_type':''},
+kappa_with_manual_df = extract_kappa_pairs(kappa_with_manual, consistent_manual_cell_type_col, substring_to_remove={'consistent_including_manual_':'', '_simplified_ai_cell_type':''},
                                            replace_dict=model_tick_labels)
 
 

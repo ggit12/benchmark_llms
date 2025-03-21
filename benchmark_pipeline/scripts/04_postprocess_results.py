@@ -65,14 +65,15 @@ print("Calculated cell type by plurality", flush=True)
 
 
 #assess the agreement between the 'consistified' manual annotations and the ai-generated annotations
-label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, ['consistent_including_manual_' + manual_cell_type_col], llm_celltype_cols, new_col_prefix='binary_agreement', comparison_level='binary')
+consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_type_col
+label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='binary_agreement', comparison_level='binary')
 print("Calculated binary agreement", flush=True)
 
 #get these column names
 binary_agreement_cols = adt.get_adata_columns(adata, contains = ['binary_agreement_consistent_including_manual'])
 
 #also assess at the partial agreement level
-label_agreement_categorical = adt.ai_compare_cell_type_labels_pairwise(adata, ['consistent_including_manual_' + manual_cell_type_col], llm_celltype_cols, new_col_prefix='categorical_agreement', comparison_level='categorical')
+label_agreement_categorical = adt.ai_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='categorical_agreement', comparison_level='categorical')
 print("Calculated categorical agreement", flush=True)
 
 #get these column names

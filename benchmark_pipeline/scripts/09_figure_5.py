@@ -87,7 +87,8 @@ celltypes_topleft = find_indices_closest_to_4_corners(agreement_df, n=10)['top_l
 celltypes_topleft = [ (i,) for i in celltypes_topleft] # Make compatible with adt.build_adata_dict
 
 #get adata with these celltypes
-adata_topleft = adt.concatenate_adata_dict(adt.build_adata_dict(adata, strata_keys=['consistent_including_manual_' + manual_cell_type_col], desired_strata=celltypes_topleft))
+consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
+adata_topleft = adt.concatenate_adata_dict(adt.build_adata_dict(adata, strata_keys=[consistent_manual_cell_type_col], desired_strata=celltypes_topleft))
 
 # Panel A
 # ai_cell_type_col = 'consistent_including_manual_claude-3-5-sonnet-20240620_simplified_ai_cell_type'
@@ -101,7 +102,7 @@ with open('./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'rb'
 # ai_cell_type_col = 'consistent_including_manual_' + os.environ['MODEL_FOR_DETAILED_ANALYSIS'] + '_simplified_ai_cell_type'
 
 cm_topleft = adt.plot_confusion_matrix_from_adata(adata_topleft,
-    true_label_key='consistent_including_manual_' + manual_cell_type_col,
+    true_label_key=consistent_manual_cell_type_col,
     predicted_label_key=ai_cell_type_col,
     diagonalize=True,
     figsize=(5,5),

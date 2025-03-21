@@ -61,8 +61,9 @@ llm_celltype_cols_top_models = pickle.load(
 )
 
 # get the top 10 cell types by count
+consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
 adata_large_celltypes = adt.wrappers.sample_and_drop_adata_dict(
-    {"adata": adata}, strata_keys=["cell_ontology_class"], n_largest_groups=10
+    {"adata": adata}, strata_keys=[consistent_manual_cell_type_col], n_largest_groups=10
 )["adata"]
 
 
@@ -72,7 +73,7 @@ adata_large_celltypes = adt.wrappers.sample_and_drop_adata_dict(
 # plot the binary agreement
 agreement_plot_top_celltypes = adt.plot_model_agreement(
     adata_large_celltypes,
-    group_by="consistent_including_manual_" + manual_cell_type_col,
+    group_by=consistent_manual_cell_type_col,
     sub_group_by="tissue",
     agreement_cols=binary_agreement_cols_top_models,
     granularity=1,
@@ -103,7 +104,7 @@ agreement_table_top_celltypes.to_pickle(
 # plot the perfect match only agreement
 agreement_plot_overall_categorical_perfect_top_celltypes = adt.plot_model_agreement(
     adata_large_celltypes,
-    group_by="consistent_including_manual_" + manual_cell_type_col,
+    group_by=consistent_manual_cell_type_col,
     sub_group_by="tissue",
     agreement_cols=perfect_only_categorical_agreement_cols_top_models,
     granularity=1,
@@ -140,7 +141,7 @@ agreement_plots_by_tissue_celltype_top_celltypes = []
 for col in binary_agreement_cols_top_models:
     agreement_plot_temp = adt.plot_model_agreement(
         adata_large_celltypes,
-        group_by="consistent_including_manual_" + manual_cell_type_col,
+        group_by=consistent_manual_cell_type_col,
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
@@ -190,7 +191,7 @@ with open(
 agreement_df_large_celltypes = compute_agreement_df(
     adata_large_celltypes,
     rater_cols=llm_celltype_cols_top_models,
-    manual_col="consistent_including_manual_" + manual_cell_type_col,
+    manual_col=consistent_manual_cell_type_col,
     agreement_type="plurality",
     normalize_values=False,
 )
@@ -223,7 +224,7 @@ agreement_scatterplot_large_celltypes[0].savefig(
 # get adata_dict of celltypes in top-left
 adata_top_left_cells = adt.build_adata_dict(
     adata_large_celltypes,
-    strata_keys=["consistent_including_manual_cell_ontology_class"],
+    strata_keys=[consistent_manual_cell_type_col],
     desired_strata=[("Basal Cell",), ("Stromal Cell",)],
 )
 
@@ -240,7 +241,7 @@ with open('./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'rb'
 # make sankey plots among the top models and the manual annotation
 sankey_ai_to_man = adt.wrappers.plot_sankey_adata_dict(
     adata_top_left_cells,
-    cols=["cell_ontology_class"]
+    cols=[manual_cell_type_col]
     + [
         ai_cell_type_col
     ],
@@ -262,7 +263,7 @@ with open(
 # Above might fail for basal cells, so do:
 sankey_ai_to_man_basal_cells = adt.plot_sankey(
     adata_top_left_cells[("Basal Cell",)],
-    cols=["cell_ontology_class"]
+    cols=[manual_cell_type_col]
     + [
         ai_cell_type_col
     ],
@@ -277,7 +278,7 @@ adt.save_sankey(
 # make a sankey plot for Basal Cells from manual to ai_cell_type_col (best performing)
 adata_basal_cells = adt.build_adata_dict(
     adata_large_celltypes,
-    strata_keys=["consistent_including_manual_cell_ontology_class"],
+    strata_keys=[consistent_manual_cell_type_col],
     desired_strata=[("Basal Cell",), ("Stromal Cell",)],
 )
 
