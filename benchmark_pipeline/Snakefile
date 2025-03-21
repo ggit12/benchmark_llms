@@ -133,6 +133,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
+        group: "o4_postprocess"  # Only 1 postprocess rule can run at a time (to avoid hitting API rate limit of PROVIDER_FOR_POST_PROCESSING)
         resources:
             partition="cpu",
             mem="600G",
