@@ -152,7 +152,7 @@ adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
 print("Wrote preprocessed AdataDict")
 
 # Write the manual cell type column as pickle
-manual_cell_type_col = 'cell_onotology_class' # pylint: disable=invalid-name
+manual_cell_type_col = 'cell_ontology_class' # pylint: disable=invalid-name
 with open("./dat/manual_cell_type_col.pkl", 'wb') as f:
     pickle.dump(manual_cell_type_col, f)
 print("Wrote manual cell type column")
