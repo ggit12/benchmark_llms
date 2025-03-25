@@ -80,8 +80,11 @@ for model in model_list:
     with open(pickle_path, "wb") as f:
         pickle.dump(model_results, f)
 
-# Exit with error if not all models have been run successfully
+
 if not all_models_completed:
+    # Exit with error if not all models have been run successfully
     raise ValueError("Some models did not complete successfully. Check logs for details and rerun this rule.")
 else:
-    sys.exit(0)
+    #Write a done file to indicate that the script has completed
+    with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
+        f.write("done")

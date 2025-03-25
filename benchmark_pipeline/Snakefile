@@ -78,8 +78,8 @@ for run_dir in RUN_DIRS:
             input:
                 "dat/preprocessed_tissue_adt_ts2"  # Use the same preprocessed data for all runs
             output:
-                expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
-                       run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
+                touch(f"res/{run_dir}/res/02_run_provider/{provider}.done"),
+                directory(f"res/{run_dir}/res/02_run_provider")  # Protect the entire directory (so that already-run models are not rerun)
             group: provider # Implicitly sets provider concurrency limit because by defauly, `snakemake --max-jobs-per-group` is `1`
             resources:
                 partition="cpu",

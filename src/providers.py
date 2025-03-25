@@ -81,8 +81,8 @@ ENDPOINTS = ProviderEndpoints({
         "gpt-4",
         "gpt-4o",
         "gpt-4o-mini",
-        "o1-mini-2024-09-12",
-        "o3-mini-2025-01-31",
+        # "o1-mini-2024-09-12", # o-series models not yet supported in AnnDictionary
+        # "o3-mini-2025-01-31",
         ],
     "anthropic": [
         "claude-3-7-sonnet-20250219",
