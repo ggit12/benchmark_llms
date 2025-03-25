@@ -189,7 +189,7 @@ with open(
 agreement_df_large_celltypes = compute_agreement_df(
     adata_large_celltypes,
     rater_cols=llm_celltype_cols_top_models,
-    manual_col=manual_cell_type_col,
+    manual_col=consistent_manual_cell_type_col,
     agreement_type="plurality",
     normalize_values=False,
 )
@@ -222,7 +222,7 @@ agreement_scatterplot_large_celltypes[0].savefig(
 # get adata_dict of celltypes in top-left
 adata_top_left_cells = adt.build_adata_dict(
     adata_large_celltypes,
-    strata_keys=[consistent_manual_cell_type_col],
+    strata_keys=[manual_cell_type_col], #This needs to be the same as the manual col in compute_agreement_df
     desired_strata=[("basal cell",), ("stromal cell of ovary",)],
 )
 
