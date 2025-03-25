@@ -84,7 +84,7 @@ cm_colorbar_df.columns = ['Agreement with Manual', 'Inter-rater Agreement', 'Cel
 #get the celltypes with lowest agreement and make confusion matrix
 celltypes_topleft = find_indices_closest_to_4_corners(agreement_df, n=10)['top_left']
 
-celltypes_topleft = [ (i,) for i in celltypes_topleft] # Make compatible with adt.build_adata_dict
+celltypes_topleft = [(i,) for i in celltypes_topleft] # Make compatible with adt.build_adata_dict
 
 #get adata with these celltypes
 consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col

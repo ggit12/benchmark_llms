@@ -1,12 +1,15 @@
 """
 This script takes model, input, and output. This script runs analysis on input using the specified model and saves to output.
 """
+# pylint: disable=invalid-name
 
 import os
 import sys
 import pickle
 import argparse
+
 import anndict as adt
+import pandas as pd
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -58,9 +61,27 @@ results = run_multiple_providers_models(
 )
 
 # Write out separate pickle file for each model
+# Before writing, the output is validated.
+# If the output is not as expected, writing is skipped for that model's output.
+all_models_completed = True
 for model in model_list:
     model_key = f"{args.provider}_{model}"
     model_results = results.get(model_key, {})
+    if not isinstance(model_results['label_results'], pd.DataFrame):
+        print(f"Model results for {model_key} is not a pd.DataFrame.", flush=True)
+        all_models_completed = False
+        continue
+    cell_type_col = [col for col in model_results['label_results'].columns if col.endswith('_ai_cell_type')]
+    if model_results['label_results'][cell_type_col].isna().any().any():
+        print(f"Model results for {model_key} has NaN values in the '_ai_cell_type' column.", flush=True)
+        all_models_completed = False
+        continue
     pickle_path = os.path.join(args.outdir, f"{model_key}.pkl")
     with open(pickle_path, "wb") as f:
         pickle.dump(model_results, f)
+
+# Exit with error if not all models have been run successfully
+if not all_models_completed:
+    raise ValueError("Some models did not complete successfully. Check logs for details and rerun this rule.")
+else:
+    sys.exit(0)

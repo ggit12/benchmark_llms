@@ -31,6 +31,8 @@ print("Loading adata_dict", flush=True)
 adata_dict = adt.read_adata_dict('../../dat/preprocessed_tissue_adt_ts2')
 print("Loaded adata_dict", flush=True)
 
+new_label_cols = []
+
 def merge_obs_to_adata(adata_dict, results):
     """Merges obs columns that have annotations into adata_dict"""
     for organ in adata_dict.keys():
@@ -40,6 +42,7 @@ def merge_obs_to_adata(adata_dict, results):
 
                 # Identify new columns
                 new_cols = [col for col in obs_df.columns if col not in adata_dict[organ].obs.columns]
+                new_label_cols.extend(new_cols)
 
                 if new_cols:
                     # Assume the index of obs_df matches the index of adata_dict[organ].obs
@@ -48,6 +51,8 @@ def merge_obs_to_adata(adata_dict, results):
 
                     # Update the obs DataFrame
                     adata_dict[organ].obs = merged_obs
+
+new_label_cols = list(set(new_label_cols))
 
 # Assuming adata_dict and results are already defined and populated
 # adata_dict = merge_obs_to_adata(adata_dict, results)
@@ -69,8 +74,19 @@ del adata_dict
 gc.collect()
 print("deleted ``adata_dict`` to free memory", flush=True)
 
+# Loop over the new label columns in adata to make sure all cells have a valid string label and are not NaN
+# If a cell has a NaN label, issue an error for that provider
+all_label_cols_non_nan = True
+for col in new_label_cols:
+    if adata.obs[col].isnull().sum() > 0:
+        print(f"Column {col} has NaN values in the concatenated adata object. Delete output from the corresponding model and rerun rule o2.", flush=True)
+        all_label_cols_non_nan = False
+
+if not all_label_cols_non_nan:
+    raise ValueError("NaN values detected in new label columns. Please delete output as described above and rerun rule o2.", flush=True) 
+
 # Write out all generated objects
-base_path = './res/03_gather_results/'
+# base_path = './res/03_gather_results/'
 
 #adata_dict
 # pickle.dump(adata_dict, open(base_path + "ts2_de_novo_llm_annotated_adt", 'wb'))
