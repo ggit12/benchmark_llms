@@ -67,15 +67,24 @@ all_models_completed = True
 for model in model_list:
     model_key = f"{args.provider}_{model}"
     model_results = results.get(model_key, {})
-    if not isinstance(model_results['label_results'], pd.DataFrame):
-        print(f"Model results for {model_key} is not a pd.DataFrame.", flush=True)
+    
+    # Check each DataFrame in the dictionary
+    this_model_completed = True
+    for label, df in model_results['label_results'].items():
+        if not isinstance(df, pd.DataFrame):
+            print(f"Result for label '{label}' in {model_key} is not a pd.DataFrame.", flush=True)
+            this_model_completed = False
+
+        cell_type_col = [col for col in df.columns if col.endswith('_ai_cell_type')]
+        if cell_type_col and df[cell_type_col].isna().any().any():
+            print(f"Results for label '{label}' in {model_key} has NaN values in the '_ai_cell_type' column.", flush=True)
+            this_model_completed = False
+
+    if not this_model_completed:
         all_models_completed = False
         continue
-    cell_type_col = [col for col in model_results['label_results'].columns if col.endswith('_ai_cell_type')]
-    if model_results['label_results'][cell_type_col].isna().any().any():
-        print(f"Model results for {model_key} has NaN values in the '_ai_cell_type' column.", flush=True)
-        all_models_completed = False
-        continue
+
+    # Save results to pickle file
     pickle_path = os.path.join(args.outdir, f"{model_key}.pkl")
     with open(pickle_path, "wb") as f:
         pickle.dump(model_results, f)
