@@ -47,7 +47,10 @@ print(f"Models to run: {model_list}")
 
 #End if all models have been run
 if not model_list:
-    print(f"All models for {args.provider} have already been run.")
+    #Write a done file to indicate that the script has completed
+    with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
+        f.write("done")
+    print(f"All models for {args.provider} have already been run.", flush=True)
     sys.exit(0)
 
 # Create a dict mapping this provider to its models
