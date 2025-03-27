@@ -83,7 +83,7 @@ for run_dir in RUN_DIRS:
             group: provider # Implicitly sets provider concurrency limit because by defauly, `snakemake --max-jobs-per-group` is `1`
             resources:
                 partition="cpu",
-                mem="600G",
+                mem=600000,
                 # cpus=30,
                 runtime=480,
                 ntasks=1,
@@ -109,7 +109,7 @@ for run_dir in RUN_DIRS:
         group: os.environ["PROVIDER_FOR_POST_PROCESSING"]  # Only 1 gather rule can run at a time (to avoid hitting API rate limit of PROVIDER_FOR_POST_PROCESSING)
         resources:
             partition="cpu",
-            mem="800G",
+            mem=800000,
             # cpus=30,
             runtime=300,
             ntasks=1,
