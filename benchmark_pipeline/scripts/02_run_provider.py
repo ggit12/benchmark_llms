@@ -48,8 +48,8 @@ print(f"Models to run: {model_list}")
 #End if all models have been run
 if not model_list:
     #Write a done file to indicate that the script has completed
-    with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
-        f.write("done")
+    # with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
+    #     f.write("done")
     print(f"All models for {args.provider} have already been run.", flush=True)
     sys.exit(0)
 
@@ -96,7 +96,7 @@ for model in model_list:
 if not all_models_completed:
     # Exit with error if not all models have been run successfully
     raise ValueError("Some models did not complete successfully. Check logs for details and rerun this rule.")
-else:
-    #Write a done file to indicate that the script has completed
-    with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
-        f.write("done")
+# else:
+#     #Write a done file to indicate that the script has completed
+#     with open(os.path.join(args.outdir, f"{args.provider}.done"), "w") as f:
+#         f.write("done")
