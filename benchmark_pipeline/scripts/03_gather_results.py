@@ -20,10 +20,20 @@ results_paths = [f for f in glob.glob('./res/02_run_provider/*.pkl')]
 
 results = {}
 for path in results_paths:
-    with open(path, 'rb') as f:
-        model_results = pickle.load(f)
-        model_name = os.path.basename(path).replace('.pkl', '')
-        results[model_name] = model_results
+    model_name = os.path.basename(path).replace('.pkl', '')
+    try:
+        with open(path, 'rb') as f:
+            model_results = pickle.load(f)
+            results[model_name] = model_results
+    except Exception as e: # pylint: disable=broad-except
+        print(f"Error loading {path}: {e}", flush=True)
+        results[model_name] = e
+
+# Make sure no values of results are exceptions, raise an error if so
+if any(isinstance(result, Exception) for result in results.values()):
+    raise RuntimeError("Failed to load one or more model results")
+
+
 print("Loaded results", flush=True)
 
 # Load the adata_dict
