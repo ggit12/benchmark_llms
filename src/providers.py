@@ -52,7 +52,7 @@ PROVIDERS = {
         }
     ),
     "bedrock": ProviderConfig(
-        "bedrock", 20,
+        "bedrock", 10,
         {
             "region_name": "us-west-2",
             "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
