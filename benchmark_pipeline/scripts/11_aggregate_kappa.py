@@ -23,7 +23,7 @@ from src import (
     customize_clustermap,
 )
 
-from src import REMOVE_TICK_LABELS as model_tick_labels
+from src import MODEL_TICK_LABELS as model_tick_labels
 
 # Use a non-GUI backend
 matplotlib.use('Agg')

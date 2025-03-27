@@ -21,7 +21,7 @@ from src import (
     customize_figure,
 )
 
-from src import REMOVE_TICK_LABELS as model_tick_labels
+from src import MODEL_TICK_LABELS as model_tick_labels
 
 
 def create_agreement_plot(performance_tables, by_cell_types=False):
