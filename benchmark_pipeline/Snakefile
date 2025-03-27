@@ -106,6 +106,7 @@ for run_dir in RUN_DIRS:
                     for model in models]
         output:
             f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
+        group: os.environ["PROVIDER_FOR_POST_PROCESSING"]  # Only 1 gather rule can run at a time (to avoid hitting API rate limit of PROVIDER_FOR_POST_PROCESSING)
         resources:
             partition="cpu",
             mem="800G",
