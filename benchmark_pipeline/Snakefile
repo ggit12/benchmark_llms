@@ -86,16 +86,33 @@ for run_dir in RUN_DIRS:
     # Provider rules for each run
     for provider in ENDPOINTS.endpoints.keys():
 
-        models_that_exist = make_existing_provider_pkls(run_dir, provider)
+        rule:
+            name: f"cache_previous_o2_{provider}_{run_dir}"
+            output:
+                temp(f"res/{run_dir}/res/02_run_provider/{provider}_cache_done")
+            params:
+                provider=provider,
+                run=run_dir,
+            shell:
+                """
+                # Create cache directory
+                mkdir -p res/{params.run}/res/02_run_provider/cached_outputs/
+
+                # Move existing pkl files to cache directory (and catch error if no files exist)
+                mv res/{params.run}/res/02_run_provider/{params.provider}_*.pkl res/{params.run}/res/02_run_provider/cached_outputs/  2>/dev/null || true
+
+                # Create done marker
+                touch {output}
+                """
 
         rule:
             name: f"o2_run_{provider}_{run_dir}"
             input:
                 "dat/preprocessed_tissue_adt_ts2",  # Use the same preprocessed data for all runs
-                models_that_exist
+                f"res/{run_dir}/res/02_run_provider/{provider}_cache_done"  # Depend on cache rule
             output:
-                protected(expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
-                       run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider]))
+                expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
+                       run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
             resources:
                 partition="cpu",
                 mem_mb=600000,

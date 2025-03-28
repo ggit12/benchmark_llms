@@ -7,6 +7,7 @@ import os
 import sys
 import pickle
 import argparse
+import shutil
 
 import anndict as adt
 import pandas as pd
@@ -29,6 +30,15 @@ adata_dict = adt.read_adata_dict(args.input)
 
 # Get the list of models for this provider
 all_models = ENDPOINTS.endpoints[args.provider]
+
+# Check if cache directory exists and move files back to outdir
+cache_dir = os.path.join(args.outdir, "cached_outputs")
+if os.path.exists(cache_dir):
+    cache_files = [f for f in os.listdir(cache_dir) if f.startswith(args.provider)]
+    for file in cache_files:
+        source = os.path.join(cache_dir, file)
+        dest = os.path.join(args.outdir, file)
+        shutil.move(source, dest)
 
 # Check outdir to see which models have already been run
 os.makedirs(args.outdir, exist_ok=True)
@@ -70,7 +80,7 @@ all_models_completed = True
 for model in model_list:
     model_key = f"{args.provider}_{model}"
     model_results = results.get(model_key, {})
-    
+
     # Check each DataFrame in the dictionary
     this_model_completed = True
     for label, df in model_results['label_results'].items():
