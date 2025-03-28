@@ -96,7 +96,6 @@ for run_dir in RUN_DIRS:
             output:
                 protected(expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider]))
-            group: provider # Implicitly sets provider concurrency limit because by defauly, `snakemake --max-jobs-per-group` is `1`
             resources:
                 partition="cpu",
                 mem_mb=600000,
