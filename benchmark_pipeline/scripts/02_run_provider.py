@@ -26,8 +26,6 @@ parser.add_argument("--input", required=True, help="Path to input adata_dict dir
 parser.add_argument("--outdir", required=True, help="Output directory")
 args = parser.parse_args()
 
-adata_dict = adt.read_adata_dict(args.input)
-
 # Get the list of models for this provider
 all_models = ENDPOINTS.endpoints[args.provider]
 
@@ -69,6 +67,8 @@ provider_endpoint_dict = {args.provider: model_list}
 
 # Create a dict for provider config using the global PROVIDERS dictionary
 provider_config = {args.provider: PROVIDERS[args.provider]}
+
+adata_dict = adt.read_adata_dict(args.input)
 
 results = run_multiple_providers_models(
     adata_dict, provider_endpoint_dict, provider_config

@@ -86,6 +86,7 @@ for run_dir in RUN_DIRS:
     # Provider rules for each run
     for provider in ENDPOINTS.endpoints.keys():
 
+        # This rule is a snakemake workaround to persist valid outputs from previously run models and avoid having one rule per provider-model
         rule:
             name: f"cache_previous_o2_{provider}_{run_dir}"
             output:
