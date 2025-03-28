@@ -24,6 +24,10 @@ N_RUNS = int(os.environ["N_RUNS"])
 # Define run directories
 RUN_DIRS = [f"run_{i+1}" for i in range(N_RUNS)]
 
+# Define a global resource limit for each provider
+for provider in ENDPOINTS.endpoints.keys():
+    workflow.global_resources[f"provider_{provider}"] = 1
+
 # Main rule to generate all outputs including aggregated results
 rule all:
     input:
@@ -99,6 +103,7 @@ for run_dir in RUN_DIRS:
                 # cpus=30,
                 runtime=480,
                 ntasks=1,
+                **{f"provider_{provider}": 1}, # limit to 1 concurrent job per provider
             params:
                 provider=provider,
                 run=run_dir,
@@ -118,7 +123,6 @@ for run_dir in RUN_DIRS:
                     for model in models]
         output:
             f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
-        group: os.environ["PROVIDER_FOR_POST_PROCESSING"]  # Only 1 gather rule can run at a time (to avoid hitting API rate limit of PROVIDER_FOR_POST_PROCESSING)
         resources:
             partition="cpu",
             mem_mb=800000,
@@ -146,12 +150,12 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
-        group: "o4_postprocess"  # Only 1 postprocess rule can run at a time (to avoid hitting API rate limit of PROVIDER_FOR_POST_PROCESSING)
         resources:
             partition="cpu",
             mem="600G",
             runtime=300,
             ntasks=1,
+            **{f"provider_{os.environ["PROVIDER_FOR_POST_PROCESSING"]}": 1} # limit to 1 concurrent job per provider
         params:
             run=run_dir,
         shell:
