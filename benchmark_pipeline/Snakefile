@@ -8,6 +8,7 @@ To add a new model for an existing provider, just add it to ENDPOINTS in provide
 import os
 import sys
 from itertools import product
+import glob
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -69,14 +70,25 @@ rule o1_preprocess_ts2:
     shell:
         "python scripts/01_preprocess_ts2.py"
 
+def make_existing_provider_pkls(run_dir, provider):
+    """
+    Return a list of any existing PKLs for the given run_dir and provider.
+    """
+    pattern = f"res/{run_dir}/res/02_run_provider/{provider}_*.pkl"
+    return glob.glob(pattern)
+
 # Define rules for each run
 for run_dir in RUN_DIRS:
     # Provider rules for each run
     for provider in ENDPOINTS.endpoints.keys():
+
+        models_that_exist = make_existing_provider_pkls(run_dir, provider)
+
         rule:
             name: f"o2_run_{provider}_{run_dir}"
             input:
-                "dat/preprocessed_tissue_adt_ts2"  # Use the same preprocessed data for all runs
+                "dat/preprocessed_tissue_adt_ts2",  # Use the same preprocessed data for all runs
+                models_that_exist
             output:
                 protected(expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider]))
