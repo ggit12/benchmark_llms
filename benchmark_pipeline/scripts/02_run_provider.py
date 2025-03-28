@@ -38,7 +38,8 @@ if os.path.exists(cache_dir):
     for file in cache_files:
         source = os.path.join(cache_dir, file)
         dest = os.path.join(args.outdir, file)
-        shutil.move(source, dest)
+        shutil.copy2(source, dest)  # preserves metadata
+        os.remove(source)  # remove from cache
 
 # Check outdir to see which models have already been run
 os.makedirs(args.outdir, exist_ok=True)
