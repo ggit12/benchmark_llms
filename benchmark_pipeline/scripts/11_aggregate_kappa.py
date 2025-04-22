@@ -126,8 +126,8 @@ def main():
     kappa_clustermap_mean = customize_clustermap(
         kappa_clustermap_mean,
         remove_legend=True,
-        x_tick_substrings=["consistent_including_manual_", "_simplified_ai_cell_type"],
-        y_tick_substrings=["consistent_including_manual_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["consistent_including_manual_", "_ai_cell_type"],
+        y_tick_substrings=["consistent_including_manual_", "_ai_cell_type"],
         new_ylabel="",
         fig_width=3,
         fig_height=3.7,
@@ -145,8 +145,8 @@ def main():
     kappa_clustermap_sd = customize_clustermap(
         kappa_clustermap_sd,
         remove_legend=True,
-        x_tick_substrings=["consistent_including_manual_", "_simplified_ai_cell_type"],
-        y_tick_substrings=["consistent_including_manual_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["consistent_including_manual_", "_ai_cell_type"],
+        y_tick_substrings=["consistent_including_manual_", "_ai_cell_type"],
         new_ylabel="",
         fig_width=3,
         fig_height=3.7,

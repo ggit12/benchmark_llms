@@ -25,6 +25,8 @@ sys.path.append(os.path.join(source_dir))  # add to Python path
 from src import (
     cell_type_by_plurality,
     PROVIDERS,
+    ensure_comparable_labels_adata,
+    direct_compare_cell_type_labels_pairwise,
 )
 
 
@@ -44,27 +46,27 @@ adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
 
 #get cell type columns
 # cell_type_cols = adt.get_adata_columns(adata, col_endswith=['ai_cell_sub_type', 'simplified_ai_cell_type'], not_col_startswith=['raw', 'agreement'])
-cell_type_cols = adt.get_adata_columns(adata, ends_with=['simplified_ai_cell_type'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
+cell_type_cols = adt.get_adata_columns(adata, ends_with=['_ai_cell_type'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
 
 # Read manual cell type column
 with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
     manual_cell_type_col = pickle.load(f)
 
 #unify category labels across all ai annotations and manual annotation.
-label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+# label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+
+#make a new copies of all labels that each contains the same categories
+ensure_comparable_labels_adata(adata, cell_type_cols + [manual_cell_type_col], new_col_prefix='consistent_including_manual')
 
 #get unified cols
 unified_cell_types_with_manual = adt.get_adata_columns(adata, contains=['consistent_including_manual'])
-
-
 
 #calculate a cell type by majority vote of all the LLMs
 llm_celltype_cols = adt.get_adata_columns(adata, contains=['consistent_including_manual'], not_contains=[manual_cell_type_col])
 cell_type_by_plurality(adata, rater_cols=llm_celltype_cols, new_col_name='cell_type_by_plurality')
 print("Calculated cell type by plurality", flush=True)
 
-
-#assess the agreement between the 'consistified' manual annotations and the ai-generated annotations
+#assess the agreement between the manual annotations and the ai-generated annotations
 consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_type_col
 label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='binary_agreement', comparison_level='binary')
 print("Calculated binary agreement", flush=True)
@@ -87,6 +89,13 @@ perfect_only_categorical_agreement_cols = ["perfect_only_" + col for col in cate
 adata.obs[perfect_only_categorical_agreement_cols] = adata.obs[categorical_agreement_cols].replace(0.5, 0)
 print("Calculated perfect only categorical agreement", flush=True)
 
+#assess the agreement using direct string comparison
+direct_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='direct_string_agreement')
+print("Calculated direct string agreement", flush=True)
+
+# get these column names
+direct_string_agreement_cols = adt.get_adata_columns(adata, contains=['direct_string_agreement_consistent_including_manual'])
+
 # Write out all generated objects
 base_path = './res/04_postprocess_results/'
 
@@ -99,7 +108,7 @@ adata.write_h5ad(base_path + 'ts2_de_novo_llm_annotated.h5ad')
 print("Wrote adata", flush=True)
 
 #label_map_with_manual
-pickle.dump(label_map_with_manual, open(base_path + 'label_map_with_manual.pkl', 'wb'))
+# pickle.dump(label_map_with_manual, open(base_path + 'label_map_with_manual.pkl', 'wb'))
 
 #label_agreement_binary
 pickle.dump(label_agreement_binary, open(base_path + 'label_agreement_binary.pkl', 'wb'))
@@ -112,4 +121,5 @@ pickle.dump(llm_celltype_cols, open(base_path + 'llm_celltype_cols.pkl', 'wb'))
 pickle.dump(binary_agreement_cols, open(base_path + 'binary_agreement_cols.pkl', 'wb'))
 pickle.dump(categorical_agreement_cols, open(base_path + 'categorical_agreement_cols.pkl', 'wb'))
 pickle.dump(perfect_only_categorical_agreement_cols, open(base_path + 'perfect_only_categorical_agreement_cols.pkl', 'wb'))
+pickle.dump(direct_string_agreement_cols, open(base_path + 'direct_string_agreement_cols.pkl', 'wb'))
 print("Wrote all outputs", flush=True)

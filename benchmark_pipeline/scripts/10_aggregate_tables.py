@@ -65,6 +65,8 @@ def main():
         "Overall Binary (% of Cell Types)",
         "Perfect Match (% of Cells)",
         "Perfect Match (% of Cell Types)",
+        'Exact String Match (% of Cells)',
+        'Exact String Match (% of Cell Types)'
     ]
 
     format_as_rounded = [
@@ -119,8 +121,10 @@ def main():
       <th data-column="2" data-numeric="true">Overall Binary (% of Cell Types)</th>
       <th data-column="3" data-numeric="true">Perfect Match (% of Cells)</th>
       <th data-column="4" data-numeric="true">Perfect Match (% of Cell Types)</th>
-      <th data-column="5" data-numeric="true">Kappa with Manual Annotations</th>
-      <th data-column="6" data-numeric="true">Average Kappa with Other LLMs</th>
+      <th data-column="5" data-numeric="true">Exact String Match (% of Cells)</th>
+      <th data-column="6" data-numeric="true">Exact String Match (% of Cell Types)</th>
+      <th data-column="7" data-numeric="true">Kappa with Manual Annotations</th>
+      <th data-column="8" data-numeric="true">Average Kappa with Other LLMs</th>
     </tr>
   </thead>
   <tbody>

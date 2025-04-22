@@ -70,8 +70,12 @@ provider_config = {args.provider: PROVIDERS[args.provider]}
 
 adata_dict = adt.read_adata_dict(args.input)
 
+# Read manual cell type column
+with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
+    manual_cell_type_col = pickle.load(f)
+
 results = run_multiple_providers_models(
-    adata_dict, provider_endpoint_dict, provider_config
+    adata_dict, provider_endpoint_dict, provider_config, expected_cell_type_col=manual_cell_type_col
 )
 
 # Write out separate pickle file for each model

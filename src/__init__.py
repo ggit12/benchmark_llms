@@ -35,6 +35,15 @@ from .format_fig import (
     customize_legend_labels,
 )
 
+from .ensure_comparable_labels import (
+    ensure_comparable_labels_adata,
+    ensure_comparable_labels_main,
+)
+
+from .direct_compare_cell_type_labels_pairwise import (
+    direct_compare_cell_type_labels_pairwise,
+)
+
 from .agreement_plots import (
     plot_model_agreement_unweighted,
     plot_model_agreement_categorical_unweighted
@@ -83,6 +92,13 @@ __all__ = [
     "customize_scatterplot",
     "replace_tick_labels",
     "customize_legend_labels",
+
+    # ensure_comparable_labels
+    "ensure_comparable_labels_adata",
+    "ensure_comparable_labels_main",
+
+    # direct_compare_cell_type_labels_pairwise
+    "direct_compare_cell_type_labels_pairwise",
 
     # agreement_plots
     "plot_model_agreement_unweighted",

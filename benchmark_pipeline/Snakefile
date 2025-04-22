@@ -34,14 +34,14 @@ rule all:
         #Where rules have multiple outputs, only the last output is used
         # Original outputs for each run
         # ------------------------------
-        #to trigger o1, o2, o3, o4, o5, o8, o9
-        expand("res/{run}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg", run=RUN_DIRS),
+        #to trigger o1, o2, o3, o4, o5
+        expand("res/{run}/res/05_figure_2_and_table_2/performance_table.html", run=RUN_DIRS),
         #to trigger o6
-        expand("res/{run}/res/06_figure_s1/done", run=RUN_DIRS),
+        # expand("res/{run}/res/06_figure_s1/done", run=RUN_DIRS),
         #to trigger o7
-        expand("res/{run}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", run=RUN_DIRS),
+        # expand("res/{run}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", run=RUN_DIRS),
         # These files below won't run unless on the bigger object
-        expand("res/{run}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", run=RUN_DIRS),
+        # expand("res/{run}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", run=RUN_DIRS),
 
         # Final aggregated results
         # -------------------------
@@ -55,7 +55,7 @@ rule all:
         "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
 
         #to trigger o13
-        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
+        # "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
 
 
 # Preprocess rule - only run once
@@ -160,7 +160,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
         output:
             f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
-            f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
+            # f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
             f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
             f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
             f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
@@ -189,6 +189,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/direct_string_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
@@ -196,6 +197,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa.pkl',

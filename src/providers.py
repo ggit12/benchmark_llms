@@ -39,7 +39,7 @@ class ProviderEndpoints:
 
 # Define providers
 PROVIDERS = {
-    "openai": ProviderConfig("openai", 8000, {"api_key": os.getenv("OPENAI_API_KEY")}),
+    "openai": ProviderConfig("openai", 1000, {"api_key": os.getenv("OPENAI_API_KEY")}),
     "anthropic": ProviderConfig("anthropic", 100, {"api_key": os.getenv("ANTHROPIC_API_KEY")}),
     "google": ProviderConfig("google", 200, {"api_key": os.getenv("GOOGLE_API_KEY")}),
     "huggingface": ProviderConfig("huggingface", {"api_key": os.getenv("HUGGINGFACE_API_KEY")}),
@@ -74,13 +74,15 @@ ENDPOINTS = ProviderEndpoints({
         # 'ai21.j2-ultra-v1'                # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
     ],
     "google": [
-        "gemini-1.5-pro",
-        "gemini-1.5-flash"
+        # "gemini-1.5-pro",
+        # "gemini-1.5-flash"
         ],
     "openai": [
-        "gpt-4",
-        "gpt-4o",
+        "gpt-3.5-turbo-0125",
+        # "gpt-4",
+        # "gpt-4o",
         "gpt-4o-mini",
+        "gpt-4.1-mini-2025-04-14",
         # "o1-mini-2024-09-12", # o-series models not yet supported in AnnDictionary
         # "o3-mini-2025-01-31",
         ],
@@ -102,9 +104,11 @@ MODEL_TICK_LABELS = {
  'claude-3-haiku-20240307': 'Claude 3 Haiku',
 
  # OpenAI
+ 'gpt-3.5-turbo-0125': 'GPT-3.5 Turbo',
  'gpt-4o': 'GPT-4o',
  'gpt-4': 'GPT-4',
  'gpt-4o-mini': 'GPT-4o mini',
+ 'gpt-4.1-mini-2025-04-14': 'GPT-4.1 mini',
  'o1-mini-2024-09-12': 'o1 mini',
  'o3-mini-2025-01-31': 'o3 mini',
 
@@ -121,30 +125,3 @@ MODEL_TICK_LABELS = {
  }
 
 REMOVE_TICK_LABELS = {key: "" for key in MODEL_TICK_LABELS}
-# REMOVE_TICK_LABELS = {
-#     # Anthropic
-#     "claude-3-7-sonnet-20250219": "",
-#     "claude-3-5-sonnet-20240620": "",
-#     "claude-3-5-haiku-20241022": "",
-#     "claude-3-opus-20240229": "",
-#     "claude-3-haiku-20240307": "",
-
-#     # OpenAI
-#     "gpt-4o": "",
-#     "gpt-4": "",
-#     "gpt-4o-mini": "",
-#     "o1-mini-2024-09-12": "",
-#     "o3-mini-2025-01-31": "",
-
-
-#     # Google
-#     "gemini-1.5-pro": "",
-#     "gemini-1.5-flash": "",
-
-#     # Bedrock
-#     "meta.llama3-1-405b-instruct-v1:0": "",
-#     "meta.llama3-1-70b-instruct-v1:0": "",
-#     "meta.llama3-1-8b-instruct-v1:0": "",
-#     "mistral.mistral-large-2407-v1:0": "",
-#     "cohere.command-r-plus-v1:0": "",
-# }

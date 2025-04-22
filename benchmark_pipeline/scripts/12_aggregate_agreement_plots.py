@@ -180,7 +180,7 @@ def main():
             "categorical_agreement_consistent_including_manual_"
             + manual_cell_type_col
             + "_consistent_including_manual_",
-            "_simplified_ai_cell_type",
+            "_ai_cell_type",
         ],
         new_ylabel="Agreement with Manual Annotation (by level of agreement)",
         remove_bar_labels=True,
@@ -206,7 +206,7 @@ def main():
             "categorical_agreement_consistent_including_manual_"
             + manual_cell_type_col
             + "_consistent_including_manual_",
-            "_simplified_ai_cell_type",
+            "_ai_cell_type",
         ],
         new_ylabel="Agreement with Manual Annotation (by level of agreement)",
         remove_bar_labels=True,
