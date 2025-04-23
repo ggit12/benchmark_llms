@@ -52,7 +52,7 @@ PROVIDERS = {
         }
     ),
     "bedrock": ProviderConfig(
-        "bedrock", 10,
+        "bedrock", 100,
         {
             "region_name": "us-west-2",
             "aws_access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
@@ -121,30 +121,3 @@ MODEL_TICK_LABELS = {
  }
 
 REMOVE_TICK_LABELS = {key: "" for key in MODEL_TICK_LABELS}
-# REMOVE_TICK_LABELS = {
-#     # Anthropic
-#     "claude-3-7-sonnet-20250219": "",
-#     "claude-3-5-sonnet-20240620": "",
-#     "claude-3-5-haiku-20241022": "",
-#     "claude-3-opus-20240229": "",
-#     "claude-3-haiku-20240307": "",
-
-#     # OpenAI
-#     "gpt-4o": "",
-#     "gpt-4": "",
-#     "gpt-4o-mini": "",
-#     "o1-mini-2024-09-12": "",
-#     "o3-mini-2025-01-31": "",
-
-
-#     # Google
-#     "gemini-1.5-pro": "",
-#     "gemini-1.5-flash": "",
-
-#     # Bedrock
-#     "meta.llama3-1-405b-instruct-v1:0": "",
-#     "meta.llama3-1-70b-instruct-v1:0": "",
-#     "meta.llama3-1-8b-instruct-v1:0": "",
-#     "mistral.mistral-large-2407-v1:0": "",
-#     "cohere.command-r-plus-v1:0": "",
-# }
