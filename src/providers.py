@@ -64,11 +64,11 @@ PROVIDERS = {
 # Define model endpoints for each provider
 ENDPOINTS = ProviderEndpoints({
     "bedrock": [
-        # "meta.llama3-1-8b-instruct-v1:0", # These models disabled temporarily due to rate limit issues with the Bedrock API (too low)
-        # "meta.llama3-1-70b-instruct-v1:0",
-        # "meta.llama3-1-405b-instruct-v1:0",
-        # "cohere.command-r-plus-v1:0",
-        # "mistral.mistral-large-2407-v1:0", # End of disabled models
+        "meta.llama3-1-8b-instruct-v1:0", # These models disabled temporarily due to rate limit issues with the Bedrock API (too low)
+        "meta.llama3-1-70b-instruct-v1:0",
+        "meta.llama3-1-405b-instruct-v1:0",
+        "cohere.command-r-plus-v1:0",
+        "mistral.mistral-large-2407-v1:0", # End of disabled models
         # 'amazon.titan-text-express-v1',   # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
         # 'amazon.titan-text-lite-v1',      # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
         # 'ai21.j2-ultra-v1'                # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
@@ -85,9 +85,9 @@ ENDPOINTS = ProviderEndpoints({
         # "o3-mini-2025-01-31",
         ],
     "anthropic": [
-        # "claude-3-7-sonnet-20250219",
-        # "claude-3-5-sonnet-20240620",
-        # "claude-3-5-haiku-20241022",
+        "claude-3-7-sonnet-20250219",
+        "claude-3-5-sonnet-20240620",
+        "claude-3-5-haiku-20241022",
         # "claude-3-opus-20240229",
         # "claude-3-haiku-20240307",
     ],
