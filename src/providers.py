@@ -78,9 +78,9 @@ ENDPOINTS = ProviderEndpoints({
         # "gemini-1.5-flash"
         ],
     "openai": [
-        "gpt-3.5-turbo-0125",
+        # "gpt-3.5-turbo-0125",
         # "gpt-4",
-        # "gpt-4o",
+        "gpt-4o",
         "gpt-4o-mini",
         "gpt-4.1-mini-2025-04-14",
         # "o1-mini-2024-09-12", # o-series models not yet supported in AnnDictionary
