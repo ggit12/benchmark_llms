@@ -21,15 +21,17 @@ from dotenv import load_dotenv
 load_dotenv()
 
 #read data
-adata = sc.read_h5ad(os.environ["INPUT_DATA"]) 
+adata = sc.read_h5ad(os.environ["INPUT_DATA"])
 
 #remove extra obsm and layers for memory purposes
 # Delete all the extra data
 for key in ['X_pca', 'X_scvi', 'X_umap', 'X_umap_scvi_full_donorassay', 'X_uncorrected_alltissues_umap', 'X_uncorrected_umap']:
-    del adata.obsm[key]
+    if key in adata.obsm:
+        del adata.obsm[key]
 
 for key in ['decontXcounts', 'log_normalized', 'scale_data']:
-    del adata.layers[key]
+    if key in adata.layers:
+        del adata.layers[key]
 
 #set X to be raw_counts
 adata.X = adata.layers['raw_counts'].copy()
@@ -152,7 +154,7 @@ adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
 print("Wrote preprocessed AdataDict")
 
 # Write the manual cell type column as pickle
-manual_cell_type_col = 'cell_ontology_class' # pylint: disable=invalid-name
+manual_cell_type_col = 'broad_cell_class' # pylint: disable=invalid-name
 with open("./dat/manual_cell_type_col.pkl", 'wb') as f:
     pickle.dump(manual_cell_type_col, f)
 print("Wrote manual cell type column")
