@@ -78,6 +78,8 @@ results = run_multiple_providers_models(
 # Before writing, the output is validated.
 # If the output is not as expected, writing is skipped for that model's output.
 all_models_completed = True
+completed_model_paths = []
+completed_model_cache_paths = []
 for model in model_list:
     model_key = f"{args.provider}_{model}"
     model_results = results.get(model_key, {})
@@ -100,11 +102,19 @@ for model in model_list:
 
     # Save results to pickle file
     pickle_path = os.path.join(args.outdir, f"{model_key}.pkl")
+    cache_path = os.path.join(cache_dir, f"{model_key}.pkl")
+    completed_model_paths.append(pickle_path)
+    completed_model_cache_paths.append(cache_path)
     with open(pickle_path, "wb") as f:
         pickle.dump(model_results, f)
 
 
 if not all_models_completed:
+    # Move the successful models to the cache directory so that snakemake doesn't delete them
+    for model_path, cache_path in zip(completed_model_paths, completed_model_cache_paths):
+        shutil.copy2(model_path, cache_path)
+        os.remove(model_path)
+
     # Exit with error if not all models have been run successfully
     raise ValueError("Some models did not complete successfully. Check logs for details and rerun this rule.")
 # else:
