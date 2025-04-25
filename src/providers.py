@@ -66,7 +66,7 @@ ENDPOINTS = ProviderEndpoints({
     "bedrock": [
         "meta.llama3-1-8b-instruct-v1:0", # These models disabled temporarily due to rate limit issues with the Bedrock API (too low)
         "meta.llama3-1-70b-instruct-v1:0",
-        "meta.llama3-1-405b-instruct-v1:0",
+        # "meta.llama3-1-405b-instruct-v1:0",
         "cohere.command-r-plus-v1:0",
         "mistral.mistral-large-2407-v1:0", # End of disabled models
         # 'amazon.titan-text-express-v1',   # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
