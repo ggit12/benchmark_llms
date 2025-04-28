@@ -139,6 +139,8 @@ def run_multiple_providers_models(adata_dict, provider_endpoint_dict, provider_c
                 print(f"Warning: Overriding model in config from '{llm_config['model']}' to '{model}'")
             llm_config['model'] = model
 
+            # Save the original columns of each adata object
+            original_cols = adata_dict.fapply(lambda adata: set(adata.obs.columns))
 
             # obs_dict, appropriate_resolution_dict, label_results, simplified_mappings, sub_cluster_mappings, simplified_sub_cluster_mappings = process_adata_dict(adata_dict, llm_config)
             obs_dict, appropriate_resolution_dict, label_results, simplified_mappings = process_adata_dict(adata_dict, llm_config)
@@ -151,7 +153,10 @@ def run_multiple_providers_models(adata_dict, provider_endpoint_dict, provider_c
                 # 'simplified_sub_cluster_mappings': simplified_sub_cluster_mappings
             }
 
-            #sleep 1 min in between models to prevent API overload (rate limiter is reset each time a new model is initiated)
-            time.sleep(60)
+            # Remove extra columns that were added during processing (they'll be merged into adata_dict later)
+            adata_dict.fapply(lambda adata, original_cols: adata.obs.drop(columns=set(adata.obs.columns) - original_cols, inplace=True), original_cols=original_cols)
+
+            #sleep ~1 min in between models to prevent API overload (rate limiter is reset each time a new model is initiated)
+            time.sleep(70)
 
     return results
