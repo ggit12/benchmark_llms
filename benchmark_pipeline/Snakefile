@@ -203,7 +203,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.html',
         resources:
             partition="cpu",
-            mem="1000G",
+            mem="1200G",
             runtime=300,
             ntasks=1,
         params:
