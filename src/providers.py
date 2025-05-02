@@ -74,13 +74,14 @@ ENDPOINTS = ProviderEndpoints({
         # 'ai21.j2-ultra-v1'                # This model doesn't work well enough to include in benchmarking analysis (failed preliminary testing)
     ],
     "google": [
-        "gemini-1.5-pro",
-        "gemini-1.5-flash"
+        "gemini-1.5-pro-002",
+        "gemini-1.5-flash-002"
         ],
     "openai": [
-        "gpt-4",
-        "gpt-4o",
-        "gpt-4o-mini",
+        "gpt-4-0613",
+        "gpt-4o-2024-08-06",
+        "gpt-4o-mini-2024-07-18",
+        # "gpt-4.1-2025-04-14",
         # "o1-mini-2024-09-12", # o-series models not yet supported in AnnDictionary
         # "o3-mini-2025-01-31",
         ],
@@ -89,7 +90,7 @@ ENDPOINTS = ProviderEndpoints({
         "claude-3-5-sonnet-20240620",
         "claude-3-5-haiku-20241022",
         "claude-3-opus-20240229",
-        # "claude-3-haiku-20240307",
+        "claude-3-haiku-20240307",
     ],
 })
 
