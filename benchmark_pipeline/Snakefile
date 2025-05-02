@@ -57,6 +57,9 @@ rule all:
         #to trigger o13
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
 
+        #to trigger o14
+        "res/14_extract_DEGs/DEGs.pkl",
+
 
 # Preprocess rule - only run once
 rule o1_preprocess_ts2:
@@ -392,4 +395,20 @@ rule o13_aggregate_agreement_plots_largest_celltypes:
         python scripts/13_aggregate_agreement_plots_largest_celltypes.py \
             --input-tables {input.tables} \
             --input-tables-perfect-only {input.tables_perfect_only} \
+        """
+
+rule o14_extract_DEGs:
+    input:
+        "dat/preprocessed_tissue_adt_ts2",
+    output:
+        "res/14_extract_DEGs/DEGs.csv",
+        "res/14_extract_DEGs/DEGs.pkl",
+    resources:
+        partition="cpu",
+        mem="400G",
+        runtime=60,
+        ntasks=1,
+    shell:
+        """
+        python scripts/14_extract_DEGs.py
         """
