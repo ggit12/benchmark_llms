@@ -103,15 +103,15 @@ MODEL_TICK_LABELS = {
  'claude-3-haiku-20240307': 'Claude 3 Haiku',
 
  # OpenAI
- 'gpt-4o': 'GPT-4o',
- 'gpt-4': 'GPT-4',
- 'gpt-4o-mini': 'GPT-4o mini',
+ 'gpt-4o-2024-08-06': 'GPT-4o',
+ 'gpt-4-0613': 'GPT-4',
+ 'gpt-4o-mini-2024-07-18': 'GPT-4o mini',
  'o1-mini-2024-09-12': 'o1 mini',
  'o3-mini-2025-01-31': 'o3 mini',
 
  # Google
- 'gemini-1.5-flash': 'Gemini 1.5 Flash',
- 'gemini-1.5-pro': 'Gemini 1.5 Pro',
+ 'gemini-1.5-flash-002': 'Gemini 1.5 Flash',
+ 'gemini-1.5-pro-002': 'Gemini 1.5 Pro',
 
  # Bedrock
  'meta.llama3-1-405b-instruct-v1:0': 'Llama 3.1 405B Instruct',
