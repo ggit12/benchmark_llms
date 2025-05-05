@@ -240,25 +240,25 @@ module_fig.savefig('./res/09_figure_5/gene_module_scores_in_phagocytes.svg', for
 
 # Panel C
 # Plot and customize the first UMAP (Macrophage Score)
-fig1 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
+fig1 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
 ax1 = fig1.axes[0]
 customize_scatterplot((fig1, ax1))
 fig1.savefig('./res/09_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
 
 # Plot and customize the second UMAP (Monocyte Score)
-fig2 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
+fig2 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
 ax2 = fig2.axes[0]
 customize_scatterplot((fig2, ax2))
 fig2.savefig('./res/09_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
 
 # Plot and customize the third UMAP (Dendritic Cell Score)
-fig3 = sc.pl.umap(adata_temp['mononuclear phagocyte'], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
+fig3 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
 ax3 = fig3.axes[0]
 customize_scatterplot((fig3, ax3))
 fig3.savefig('./res/09_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
 
 
 #To confirm which UMAP is which score
-sc.pl.umap(adata_temp['mononuclear phagocyte'], color='macrophage_score', title='Macrophage Module Score', vmax='p99')
-sc.pl.umap(adata_temp['mononuclear phagocyte'], color='monocyte_score', title='Monocyte Module Score', vmax='p99')
-sc.pl.umap(adata_temp['mononuclear phagocyte'], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
+sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='macrophage_score', title='Macrophage Module Score', vmax='p99')
+sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='monocyte_score', title='Monocyte Module Score', vmax='p99')
+sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
