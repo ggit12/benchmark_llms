@@ -185,6 +185,7 @@ gene_lists = {
 }
 
 adata_temp = adt.build_adata_dict(adata_topleft, strata_keys=[manual_cell_type_col])
+print(adata_temp.keys())
 
 # TODO: Code below here won't run unless on bigger object
 
