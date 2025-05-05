@@ -9,6 +9,7 @@ import os
 import sys
 
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 
@@ -90,13 +91,16 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     # Create the plot
     fig, ax = plt.subplots(figsize=(14, 8))
 
+    # Set the color palette
+    palette = plt.get_cmap('Paired')(np.linspace(0, 1, plot_df['model_name'].nunique()))
+
     # Plot the aggregated bars
     sns.barplot(
         data=plot_df,
         x='cell_type',
         y='agreement',
         hue='model_name',
-        palette='Paired',
+        palette=palette,
         ax=ax,
         order=sorted_cell_types,
         errorbar='sd',
@@ -185,17 +189,11 @@ def main():
     agreement_tables.reset_index(drop=True, inplace=True)
     agreement_tables_perfect.reset_index(drop=True, inplace=True)
 
+
+    # Create overall binary agreement plot
     # Create agreement plot for largest cell types
     agreement_plot = create_cell_type_model_plot(
         agreement_tables, perfect_match=False
-    )
-
-    customize_figure(
-        agreement_plot,
-        remove_legend=False,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
-        fig_width=2.4,
-        fig_height=3,
     )
 
     # Fix the legend labels as well
@@ -207,21 +205,29 @@ def main():
     # Fix legend position
     agreement_plot[1].legend(title="Models", bbox_to_anchor=(1.05, 1), loc="upper right")
 
+    # Save a version of the plot with the legend
+    agreement_plot[0].savefig(
+        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_withlegend.svg", format="svg"
+    )
+
+    # Customize figure and remove the legend
+    customize_figure(
+        agreement_plot,
+        remove_legend=True,
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        fig_width=2.4,
+        fig_height=3,
+    )
+
+    # Save a version of the plot with the legend
     agreement_plot[0].savefig(
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes.svg", format="svg"
     )
 
+
     # Create perfect match agreement plot
     agreement_plot_perfect_only = create_cell_type_model_plot(
         agreement_tables_perfect, perfect_match=True
-    )
-
-    customize_figure(
-        agreement_plot_perfect_only,
-        remove_legend=False,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
-        fig_width=2.4,
-        fig_height=3,
     )
 
     # Fix the legend labels as well
@@ -233,9 +239,25 @@ def main():
     # Fix legend position
     agreement_plot_perfect_only[1].legend(title="Models", bbox_to_anchor=(1.05, 1), loc="upper right")
 
+    # Save a version of the plot with the legend
+    agreement_plot_perfect_only[0].savefig(
+        "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only_withlegend.svg", format="svg"
+    )
+
+    # Customize figure and remove the legend
+    customize_figure(
+        agreement_plot_perfect_only,
+        remove_legend=True,
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        fig_width=2.4,
+        fig_height=3,
+    )
+
+    # Save a version of the plot without the legend
     agreement_plot_perfect_only[0].savefig(
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg", format="svg"
     )
+
 
 
 if __name__ == "__main__":
