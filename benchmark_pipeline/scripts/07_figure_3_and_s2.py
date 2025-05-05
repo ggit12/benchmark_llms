@@ -232,7 +232,7 @@ adata_top_left_cells = adt.build_adata_dict(
 with open('./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'rb') as f:
     ai_cell_type_col = pickle.load(f)[0]
 
-# Or to manually specific a specific model (included for flexibility)
+# Or to manually specify a model (included for flexibility)
 # ai_cell_type_col = 'consistent_including_manual_' + os.environ['MODEL_FOR_DETAILED_ANALYSIS'] + '_simplified_ai_cell_type'
 
 
