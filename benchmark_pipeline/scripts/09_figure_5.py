@@ -143,7 +143,7 @@ score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
 
 # Get the marker genes used for each score
 marker_genes = {col: adata.var.index[adata.var[col]].tolist() for col in score_cols}
-pd.DataFrame(marker_genes).to_html("genes_used_in_scores.html")
+pd.DataFrame(marker_genes).to_html("./res/09_figure_5/genes_used_in_scores.html")
 
 # Plot the scores
 fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [manual_cell_type_col] + [ai_cell_type_col])
