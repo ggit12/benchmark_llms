@@ -40,3 +40,18 @@ print("Saving DEGs as pickle", flush=True)
 with open('res/14_extract_DEGs/DEGs.pkl', 'wb') as f:
     pickle.dump(top_n_genes, f)
 print("Saved DEGs as pickle", flush=True)
+
+# Create output file to record DEG analysis
+with open('res/14_extract_DEGs/DEG_frequencies.txt', 'w', encoding="utf-8") as out_file:
+    # Output number of clusters analyzed (number of unique rows in DEG[["groups","adt_key"]]):
+    cluster_count = len(top_n_genes[["group", "adt_key"]].drop_duplicates())
+    out_file.write(f"Number of clusters analyzed: {cluster_count}\n\n")
+
+    # Output number of occurrences of these genes
+    genes = ["IGHM", "IGHD", "YBX3", "TNFRSF13B", "CD27", "ATXN1"]
+    gene_counts = top_n_genes['names'].value_counts()[genes].fillna(0).astype(int)
+    out_file.write("Number of occurrences for each gene:\n")
+    for gene, count in gene_counts.items():
+        out_file.write(f"{gene}: {count}\n")
+
+print("DEG frequency analysis written to res/14_extract_DEGs/DEG_frequencies.txt")

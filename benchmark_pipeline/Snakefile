@@ -58,7 +58,7 @@ rule all:
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
 
         #to trigger o14
-        "res/14_extract_DEGs/DEGs.pkl",
+        "res/14_extract_DEGs/DEG_frequencies.txt",
 
 
 # Preprocess rule - only run once
@@ -403,6 +403,7 @@ rule o14_extract_DEGs:
     output:
         "res/14_extract_DEGs/DEGs.csv",
         "res/14_extract_DEGs/DEGs.pkl",
+        "res/14_extract_DEGs/DEG_frequencies.txt",
     resources:
         partition="cpu",
         mem="400G",
