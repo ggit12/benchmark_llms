@@ -22,7 +22,7 @@ def extract_DEGs(adata, n_genes=10, adt_key=None):
     """
     Extract the differentially expressed genes for each cluster of each tissue
     """
-    DEG_df = sc.get.rank_genes_groups_df(adata, None).groupby('group').head(n_genes).reset_index(drop=True)
+    DEG_df = sc.get.rank_genes_groups_df(adata, None).groupby('group', observed=False).head(n_genes).reset_index(drop=True)
     if adt_key is not None:
         DEG_df['adt_key'] = [adt_key for _ in range(len(DEG_df))]
     return DEG_df
@@ -49,7 +49,7 @@ with open('res/14_extract_DEGs/DEG_frequencies.txt', 'w', encoding="utf-8") as o
 
     # Output number of occurrences of these genes
     genes = ["IGHM", "IGHD", "YBX3", "TNFRSF13B", "CD27", "ATXN1"]
-    gene_counts = top_n_genes['names'].value_counts()[genes].fillna(0).astype(int)
+    gene_counts = top_n_genes['names'].value_counts().reindex(genes, fill_value=0).astype(int)
     out_file.write("Number of occurrences for each gene:\n")
     for gene, count in gene_counts.items():
         out_file.write(f"{gene}: {count}\n")
