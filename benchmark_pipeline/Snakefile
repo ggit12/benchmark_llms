@@ -312,11 +312,14 @@ for run_dir in RUN_DIRS:
         output:
             f'res/{run_dir}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
             # f'res/{run_dir}/res/09_figure_5/sankey_topleft_of_agreement.svg',
+            f'res/{run_dir}/res/09_figure_5/genes_used_in_scores.html',
+            f'res/{run_dir}/res/09_figure_5/marker_gene_scores_withlegend.svg',
+            f'res/{run_dir}/res/09_figure_5/marker_gene_scores.svg',
             # These files below won't run unless on the bigger object
-            f'res/{run_dir}/res/09_figure_5/gene_module_scores_in_phagocytes.svg',
-            f'res/{run_dir}/res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',
-            f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
-            f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
+            # f'res/{run_dir}/res/09_figure_5/gene_module_scores_in_phagocytes.svg',
+            # f'res/{run_dir}/res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',
+            # f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
+            # f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
         resources:
             partition="cpu",
             mem="600G",
