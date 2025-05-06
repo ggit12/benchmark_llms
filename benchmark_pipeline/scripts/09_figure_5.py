@@ -57,8 +57,8 @@ adt.configure_llm_backend(**llm_config)
 adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
 
 # Read the agreement_df and agreement_weights_df
-agreement_df = pickle.load(open("./res/08_figure_4/agreement_df.pkl", "rb"))
-agreement_weights_df = pickle.load(open("./res/08_figure_4/agreement_weights_df.pkl", "rb"))
+agreement_df = pickle.load(open("./res/08_figure_4/agreement_df_without_largest.pkl", "rb"))
+agreement_weights_df = pickle.load(open("./res/08_figure_4/agreement_weights_df_without_largest.pkl", "rb"))
 
 # And the various column names
 manual_cell_type_col = pickle.load(
@@ -90,13 +90,12 @@ llm_celltype_cols_top_models = pickle.load(
 cm_colorbar_df = agreement_df.join(agreement_weights_df.rename('agreement_weight'))
 cm_colorbar_df.columns = ['Agreement with Manual', 'Inter-rater Agreement', 'Cell Type Abundance (% of Atlas)']
 
-
 #get the celltypes with lowest agreement and make confusion matrix
 celltypes_topleft = find_indices_closest_to_4_corners(agreement_df, n=10)['top_left']
-
 celltypes_topleft = [(i,) for i in celltypes_topleft] # Make compatible with adt.build_adata_dict
 
 #get adata with these celltypes
+# same as in 07_figure_3_and_s2.py, we use the consistent_including_manual cell type column to hone in on the cell types, and directly use their manual annotation for further investigation
 consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
 adata_topleft = adt.concatenate_adata_dict(adt.build_adata_dict(adata, strata_keys=[consistent_manual_cell_type_col], desired_strata=celltypes_topleft))
 
@@ -127,35 +126,82 @@ cm_topleft.savefig('./res/09_figure_5/confusion_matrix_for_cells_topleft_of_agre
 # sankey_topleft = adt.plot_sankey(adata_topleft, cols=[ai_cell_type_col, manual_cell_type_col,])
 # adt.save_sankey(sankey_topleft, filename='./res/08_figure_5/sankey_topleft_of_agreement.svg')
 
-#look at the largest cell type of those closest to the topleft corner
-largest_cell_type = adata_topleft.obs[manual_cell_type_col].value_counts().index[0]
+#look at the cell types closest to the top left corner of the agreement plot
+adata_dict = adt.build_adata_dict(adata_topleft, strata_keys=[manual_cell_type_col])
 
-adata_single = adt.build_adata_dict(adata_topleft, strata_keys=[manual_cell_type_col], desired_strata=[(largest_cell_type,)])
 
-# Get up to the top 3 most frequent LLM labels for this cell type
-top_3_labels = adata_single.obs[ai_cell_type_col].value_counts().index[:3].tolist()
+def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefined-outer-name
+    """
+    Retrieve a set of marker genes and plot its score for a specific cell type in an AnnData object.
+    """
 
-#look up marker genes and calculate scores
-adt.cell_type_marker_gene_score(adata, cell_types=[largest_cell_type] + top_3_labels, species='Human', list_length=None, suffix="_marker_gene_score")
+    cell_type = adt_key[0]
 
-# Get the score column names
-score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
+    # Get up to the top 3 most frequent LLM labels for this cell type
+    top_3_labels = adata.obs[ai_cell_type_col].value_counts().index[:3].tolist()
 
-# Get the marker genes used for each score
-marker_genes = {col: adata.var.index[adata.var[col]].tolist() for col in score_cols}
-pd.DataFrame(marker_genes).to_html('./res/09_figure_5/genes_used_in_scores.html')
+    #look up marker genes and calculate scores
+    adt.cell_type_marker_gene_score(adata, cell_types=[cell_type] + top_3_labels, species='Human', list_length=None, suffix="_marker_gene_score")
 
-# Plot the scores
-fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [manual_cell_type_col] + [ai_cell_type_col])
+    # Get the score column names
+    score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
 
-# Save a version of the plot with the legend
-fig.savefig('./res/09_figure_5/marker_gene_scores_withlegend.svg', format='svg')
+    # Get the marker genes used for each score
+    marker_genes = {col: adata.var.index[adata.var[col]].tolist() for col in score_cols}
+    marker_genes_df = (
+    pd.Series(marker_genes)
+      .reset_index()
+      .rename(columns={
+          'index': 'score_col',
+          0: 'genes_used'
+      })
+    )
 
-for ax in np.ravel(axes):
-    customize_scatterplot((fig, ax))
+    marker_genes_df.to_html(f'./res/09_figure_5/genes_used_in_scores_{cell_type}.html', index=False)
 
-# Save a version of the plot without the legend
-fig.savefig('./res/09_figure_5/marker_gene_scores.svg', format='svg')
+    # Plot the scores
+    fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [manual_cell_type_col] + [ai_cell_type_col])
+
+    # Save a version of the plot with the legend
+    fig.savefig(f'./res/09_figure_5/marker_gene_scores_withlegend_{cell_type}.svg', format='svg')
+
+    for ax in np.ravel(axes):
+        customize_scatterplot((fig, ax))
+
+    # Save a version of the plot without the legend
+    fig.savefig(f'./res/09_figure_5/marker_gene_scores_{cell_type}.svg', format='svg')
+
+adata_dict.fapply(plot_llm_markers_adata_dict)
+
+#save a .done file for the marker gene score plots
+with open('./res/09_figure_5/marker_gene_scores.done', 'w', encoding='utf-8') as f:
+    f.write('done')
+
+
+# # Get up to the top 3 most frequent LLM labels for this cell type
+# top_3_labels = adata_single.obs[ai_cell_type_col].value_counts().index[:3].tolist()
+
+# #look up marker genes and calculate scores
+# adt.cell_type_marker_gene_score(adata, cell_types=[largest_cell_type] + top_3_labels, species='Human', list_length=None, suffix="_marker_gene_score")
+
+# # Get the score column names
+# score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
+
+# # Get the marker genes used for each score
+# marker_genes = {col: adata.var.index[adata.var[col]].tolist() for col in score_cols}
+# pd.DataFrame(marker_genes).to_html('./res/09_figure_5/genes_used_in_scores.html')
+
+# # Plot the scores
+# fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [manual_cell_type_col] + [ai_cell_type_col])
+
+# # Save a version of the plot with the legend
+# fig.savefig('./res/09_figure_5/marker_gene_scores_withlegend.svg', format='svg')
+
+# for ax in np.ravel(axes):
+#     customize_scatterplot((fig, ax))
+
+# # Save a version of the plot without the legend
+# fig.savefig('./res/09_figure_5/marker_gene_scores.svg', format='svg')
 
 # Old code for generating gene lists and plotting just looking at mononuclear phagocytes
 # Code below here won't run unless on bigger object

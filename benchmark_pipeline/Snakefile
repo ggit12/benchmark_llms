@@ -246,12 +246,14 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl'
         output:
+            f"res/{run_dir}/res/07_figure_3_and_s2/ten_largest_cell_types.pkl",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes.pkl",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes_perfect_only.pkl",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done",  # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
+            f"res/{run_dir}/res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
             # These files below won't run unless on the bigger object
             f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done",
             f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
@@ -260,7 +262,7 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg"
+            f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
         resources:
             partition="cpu",
             mem="600G",
@@ -288,7 +290,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/08_figure_4/agreement_scatterplot_overall_unweighted_unnormalized.svg',
             f'res/{run_dir}/res/08_figure_4/agreement_scatterplot_overall_weighted_normalized.svg',
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
-            f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
+            f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl',
         resources:
             partition="cpu",
             mem="600G",
@@ -312,9 +314,7 @@ for run_dir in RUN_DIRS:
         output:
             f'res/{run_dir}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg',
             # f'res/{run_dir}/res/09_figure_5/sankey_topleft_of_agreement.svg',
-            f'res/{run_dir}/res/09_figure_5/genes_used_in_scores.html',
-            f'res/{run_dir}/res/09_figure_5/marker_gene_scores_withlegend.svg',
-            f'res/{run_dir}/res/09_figure_5/marker_gene_scores.svg',
+            f'res/{run_dir}/res/09_figure_5/marker_gene_scores.done', # Uses a done file because the specific file names may change
             # These files below won't run unless on the bigger object
             # f'res/{run_dir}/res/09_figure_5/gene_module_scores_in_phagocytes.svg',
             # f'res/{run_dir}/res/09_figure_5/macrophage_module_umap_in_phagocytes.svg',

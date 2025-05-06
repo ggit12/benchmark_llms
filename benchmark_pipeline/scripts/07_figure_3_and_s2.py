@@ -64,6 +64,10 @@ llm_celltype_cols_top_models = pickle.load(
 consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
 adata_large_celltypes = adt.sample_and_drop(adata, strata_keys=[manual_cell_type_col], n_largest_groups=10)
 
+# write a list of the largest cell types for reference
+with open("./res/07_figure_3_and_s2/ten_largest_cell_types.pkl", "wb") as f:
+    pickle.dump(adata_large_celltypes.obs[manual_cell_type_col].unique(), f)
+
 
 # Panel A
 
@@ -186,6 +190,8 @@ with open(
 
 # To determine which cell types to look at in Panels B and D
 # compute interrater agreement
+# Consistency itself is calculated on the processed labeled columns that have been unified (i.e. made to share a common set of labels)
+# For further investigation into cell types, we use the original labels themselves (after honing in on which labels to investigate based on the agreement scores)
 agreement_df_large_celltypes = compute_agreement_df(
     adata_large_celltypes,
     rater_cols=llm_celltype_cols_top_models,
@@ -217,12 +223,22 @@ agreement_scatterplot_large_celltypes[0].savefig(
 
 
 # TODO: Code below here won't run unless on full object
+# record the cell types that are closest to the top-left corner as a txt
+with open(
+    "./res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
+    "w", encoding="utf-8",
+) as f:
+    f.write(
+        "Large cell types of interest in the top left corner of the agreement plot:\n"
+    )
+    for celltype in celltypes_of_interest_large_celltypes["top_left"]:
+        f.write(f"{celltype}\n")
 
 
-# get adata_dict of celltypes in top-left
+# get adata_dict of celltypes closest to top-left (of the largest cell types)
 adata_top_left_cells = adt.build_adata_dict(
     adata_large_celltypes,
-    strata_keys=[manual_cell_type_col], #This needs to be the same as the manual col in compute_agreement_df
+    strata_keys=[manual_cell_type_col], #This needs to be the same as the manual col in construction of adata_large_celltypes
     desired_strata=[("basal cell",), ("stromal cell of ovary",)],
 )
 
@@ -272,13 +288,6 @@ adt.save_sankey(
     filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",  # Dynamic filename for each plot
 )
 
-# Get adata for basal and stromal cells
-# make a sankey plot for Basal Cells from manual to ai_cell_type_col (best performing)
-adata_basal_cells = adt.build_adata_dict(
-    adata_large_celltypes,
-    strata_keys=[consistent_manual_cell_type_col],
-    desired_strata=[("basal cell",), ("stromal cell of ovary",)],
-)
 
 # # Panel C
 # test = adt.build_adata_dict(adata_top_left_cells['Basal Cell'].copy(), strata_keys=['tissue'])
