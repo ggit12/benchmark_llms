@@ -86,7 +86,7 @@ def process_adata_dict(
     # simplified_sub_cluster_mappings = adt.simplify_obs_column_adata_dict(adata_dict, f'{model}_ai_cell_sub_type', f'{model}_simplified_ai_cell_sub_type', simplification_level='redundancy-removed, keep periods in keys')
     # print("adata_dict has had subcluster annotations simplified")
 
-    obs_dict = {key: adata.obs for key, adata in adata_dict.items()}
+    obs_dict = {key: adata.obs[[f'{model}_ai_cell_type', f'{model}_simplified_ai_cell_type']].copy() for key, adata in adata_dict.items()}
 
     return obs_dict, appropriate_resolution_dict, label_results, simplified_mappings#, sub_cluster_mappings#, simplified_sub_cluster_mappings
 
