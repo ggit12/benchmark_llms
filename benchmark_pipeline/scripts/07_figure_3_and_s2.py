@@ -64,11 +64,6 @@ llm_celltype_cols_top_models = pickle.load(
 consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
 adata_large_celltypes = adt.sample_and_drop(adata, strata_keys=[manual_cell_type_col], n_largest_groups=10)
 
-# write a list of the largest cell types for reference
-with open("./res/07_figure_3_and_s2/ten_largest_cell_types.pkl", "wb") as f:
-    pickle.dump(adata_large_celltypes.obs[manual_cell_type_col].unique(), f)
-
-
 # Panel A
 
 # Top of A

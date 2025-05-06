@@ -58,10 +58,6 @@ llm_celltype_cols_top_models = pickle.load(
     open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
 )
 
-ten_largest_cell_types = pickle.load(
-    open('./res/07_figure_3_and_s2/ten_largest_cell_types.pkl', 'rb')
-    )
-
 #compute interrater agreement across whole atlas
 agreement_df = compute_agreement_df(adata, rater_cols=llm_celltype_cols_top_models, manual_col='consistent_including_manual_' + manual_cell_type_col, agreement_type='plurality', normalize_values=False)
 
@@ -87,14 +83,3 @@ agreement_scatterplot_weighted_normalized[0].savefig('./res/08_figure_4/agreemen
 # Write agreement_df and agreement_weights_df
 pickle.dump(agreement_df, open('./res/08_figure_4/agreement_df.pkl', 'wb'))
 pickle.dump(agreement_weights_df, open('./res/08_figure_4/agreement_weights_df.pkl', 'wb'))
-
-
-# Recompute agreement_df and agreement_weights_df without the ten largest cell types (used in downstream analysis 09_figure_5.py)
-# This is because the largest cell types are analyzed separately
-adata = adata[~adata.obs[manual_cell_type_col].isin(ten_largest_cell_types)].copy()
-
-agreement_df_without_largest = compute_agreement_df(adata, rater_cols=llm_celltype_cols_top_models, manual_col='consistent_including_manual_' + manual_cell_type_col, agreement_type='plurality', normalize_values=False)
-agreement_weights_df_without_largest = calculate_weights(adata, 'consistent_including_manual_' + manual_cell_type_col, equal_weights=False)
-
-pickle.dump(agreement_df_without_largest, open('./res/08_figure_4/agreement_df_without_largest.pkl', 'wb'))
-pickle.dump(agreement_weights_df_without_largest, open('./res/08_figure_4/agreement_weights_df_without_largest.pkl', 'wb'))

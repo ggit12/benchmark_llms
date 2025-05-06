@@ -246,7 +246,6 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl'
         output:
-            f"res/{run_dir}/res/07_figure_3_and_s2/ten_largest_cell_types.pkl",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_table_largest_celltypes.pkl",
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_plot_largest_celltypes_perfect_only.svg",
