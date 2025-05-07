@@ -171,7 +171,7 @@ def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefine
     # Save a version of the plot without the legend
     fig.savefig(f'./res/09_figure_5/marker_gene_scores_{cell_type}.svg', format='svg')
 
-adata_dict.fapply(plot_llm_markers_adata_dict)
+adata_dict.fapply(plot_llm_markers_adata_dict, use_multithreading=False, catch_errors=False)
 
 #save a .done file for the marker gene score plots
 with open('./res/09_figure_5/marker_gene_scores.done', 'w', encoding='utf-8') as f:
