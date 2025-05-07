@@ -25,6 +25,7 @@ sys.path.append(os.path.join(source_dir))  # add to Python path
 from src import (
     cell_type_by_plurality,
     PROVIDERS,
+    ensure_label_consistency_adata,
 )
 
 
@@ -51,7 +52,8 @@ with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
     manual_cell_type_col = pickle.load(f)
 
 #unify category labels across all ai annotations and manual annotation.
-label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+# label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+label_map_with_manual = ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
 
 #get unified cols
 unified_cell_types_with_manual = adt.get_adata_columns(adata, contains=['consistent_including_manual'])

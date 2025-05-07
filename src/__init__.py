@@ -60,6 +60,11 @@ from .plot_kappa import (
     plot_average_pairwise_barchart,
 )
 
+from .ensure_label_consistency_legacy import (
+    ensure_label_consistency_adata,
+    ensure_label_consistency_main,
+)
+
 
 __all__ = [
     # providers
@@ -103,4 +108,8 @@ __all__ = [
     # plot_kappa
     "plot_pairwise_clustermap",
     "plot_average_pairwise_barchart",
+
+    # ensure_label_consistency_legacy
+    "ensure_label_consistency_adata",
+    "ensure_label_consistency_main",
 ]
