@@ -57,8 +57,8 @@ adt.configure_llm_backend(**llm_config)
 adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
 
 # Read the agreement_df and agreement_weights_df
-agreement_df = pickle.load(open("./res/08_figure_4/agreement_df_without_largest.pkl", "rb"))
-agreement_weights_df = pickle.load(open("./res/08_figure_4/agreement_weights_df_without_largest.pkl", "rb"))
+agreement_df = pickle.load(open("./res/08_figure_4/agreement_df.pkl", "rb"))
+agreement_weights_df = pickle.load(open("./res/08_figure_4/agreement_weights_df.pkl", "rb"))
 
 # And the various column names
 manual_cell_type_col = pickle.load(
