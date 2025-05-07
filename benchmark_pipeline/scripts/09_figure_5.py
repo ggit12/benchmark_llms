@@ -141,7 +141,7 @@ def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefine
     top_3_labels = adata.obs[ai_cell_type_col].value_counts().index[:3].tolist()
 
     #look up marker genes and calculate scores
-    adt.cell_type_marker_gene_score(adata, cell_types=[cell_type] + top_3_labels, species='Human', list_length=None, suffix="_marker_gene_score")
+    adt.cell_type_marker_gene_score(adata, cell_types=[cell_type] + top_3_labels, species='Human', list_length=None, score_name="_marker_gene_score")
 
     # Get the score column names
     score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
@@ -182,7 +182,7 @@ with open('./res/09_figure_5/marker_gene_scores.done', 'w', encoding='utf-8') as
 # top_3_labels = adata_single.obs[ai_cell_type_col].value_counts().index[:3].tolist()
 
 # #look up marker genes and calculate scores
-# adt.cell_type_marker_gene_score(adata, cell_types=[largest_cell_type] + top_3_labels, species='Human', list_length=None, suffix="_marker_gene_score")
+# adt.cell_type_marker_gene_score(adata, cell_types=[largest_cell_type] + top_3_labels, species='Human', list_length=None, score_name="_marker_gene_score")
 
 # # Get the score column names
 # score_cols = adt.get_adata_columns(adata, ends_with='_marker_gene_score')
