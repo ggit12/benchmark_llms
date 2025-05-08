@@ -126,8 +126,9 @@ cm_topleft.savefig('./res/09_figure_5/confusion_matrix_for_cells_topleft_of_agre
 # sankey_topleft = adt.plot_sankey(adata_topleft, cols=[ai_cell_type_col, manual_cell_type_col,])
 # adt.save_sankey(sankey_topleft, filename='./res/08_figure_5/sankey_topleft_of_agreement.svg')
 
-#look at the cell types closest to the top left corner of the agreement plot
-adata_dict = adt.build_adata_dict(adata_topleft, strata_keys=[manual_cell_type_col])
+#look at the cell types closest to the top left corner of the agreement plot, (5 of the largest of these by abundance)
+adata_topleft = adt.sample_and_drop(adata_topleft, strata_keys=[consistent_manual_cell_type_col], n_largest_groups=5)
+adata_dict = adt.build_adata_dict(adata_topleft, strata_keys=[consistent_manual_cell_type_col])
 
 
 def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefined-outer-name
@@ -160,7 +161,7 @@ def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefine
     marker_genes_df.to_html(f'./res/09_figure_5/genes_used_in_scores_{cell_type}.html', index=False)
 
     # Plot the scores
-    fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [manual_cell_type_col] + [ai_cell_type_col])
+    fig, axes = adt.module_score_umap(adata, score_cols=score_cols + [consistent_manual_cell_type_col] + [ai_cell_type_col])
 
     # Save a version of the plot with the legend
     fig.savefig(f'./res/09_figure_5/marker_gene_scores_withlegend_{cell_type}.svg', format='svg')
@@ -170,6 +171,9 @@ def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefine
 
     # Save a version of the plot without the legend
     fig.savefig(f'./res/09_figure_5/marker_gene_scores_{cell_type}.svg', format='svg')
+
+    #TODO: add bar plots
+
 
 adata_dict.fapply(plot_llm_markers_adata_dict, use_multithreading=False, catch_errors=False)
 
