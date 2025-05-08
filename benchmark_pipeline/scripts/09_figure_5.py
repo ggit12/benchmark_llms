@@ -25,9 +25,9 @@ import scanpy as sc
 import matplotlib
 import pandas as pd
 import numpy as np
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# from anndict.utils.anndata_ import filter_gene_list
+from anndict.utils.anndata_ import filter_gene_list
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -38,7 +38,7 @@ sys.path.append(os.path.join(source_dir))  # add to Python path
 # pylint: disable=wrong-import-position
 from src import (
     find_indices_closest_to_4_corners,
-    # customize_figure,
+    customize_figure,
     customize_scatterplot,
     PROVIDERS,
 )
@@ -127,8 +127,8 @@ cm_topleft.savefig('./res/09_figure_5/confusion_matrix_for_cells_topleft_of_agre
 # adt.save_sankey(sankey_topleft, filename='./res/08_figure_5/sankey_topleft_of_agreement.svg')
 
 #look at the cell types closest to the top left corner of the agreement plot, (5 of the largest of these by abundance)
-adata_topleft = adt.sample_and_drop(adata_topleft, strata_keys=[consistent_manual_cell_type_col], n_largest_groups=5)
-adata_dict = adt.build_adata_dict(adata_topleft, strata_keys=[consistent_manual_cell_type_col])
+adata_topleft_large = adt.sample_and_drop(adata_topleft, strata_keys=[consistent_manual_cell_type_col], n_largest_groups=5)
+adata_dict = adt.build_adata_dict(adata_topleft_large, strata_keys=[consistent_manual_cell_type_col])
 
 
 def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefined-outer-name
@@ -211,145 +211,150 @@ with open('./res/09_figure_5/marker_gene_scores.done', 'w', encoding='utf-8') as
 # Code below here won't run unless on bigger object
 
 
-# # Looking into mononuclear phagocytes
-# # adt.display_html_summary(adt.summarize_metadata(adata_dict[('Stomach',)], cols=['donor*cell_ontology_class', 'donor']))
+# Looking into mononuclear phagocytes
+# adt.display_html_summary(adt.summarize_metadata(adata_dict[('Stomach',)], cols=['donor*cell_ontology_class', 'donor']))
+
+#Also run the manually curated mononuclear phagocyte analysis if present
+
+if 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique():
+
+    adata_temp = adata_topleft[adata_topleft.obs[consistent_manual_cell_type_col].isin(['Phagocyte'])]
+
+    gene_lists = {
+        "General_Mononuclear_Phagocyte": [
+            "CD68",
+            "CD14",
+            "CSF1R",
+            "ITGAM"  # CD11b
+        ],
+
+        "Macrophage_Specific": [
+            "ADGRE1",  # EMR1, human equivalent of F4/80
+            "CD163",
+            "MERTK",
+            "MSR1",   # CD204
+            "MRC1"    # CD206
+        ],
+
+        "Stomach_Tissue_Resident_Macrophage": [
+            "LYVE1",
+            "TIMD4",
+            "GATA6",
+            "SIGLEC1"  # CD169, often on tissue-resident macrophages
+        ],
+
+        "Monocyte_Markers": [
+            "FCN1",
+            "S100A8",
+            "S100A9",
+            "CCR2"
+        ],
+
+        "Dendritic_Cell_Markers": [
+            "ZBTB46",
+            "FLT3",
+            "CD1C",
+            "CLEC10A"  # CD301, often on human DCs
+        ],
+
+        "Macrophage_Function": [
+            "MARCO",
+            "MMP9",
+            "TIMP3",
+            "FTL",
+            "FTH1",
+            "CD64"     # FCGR1A, important for phagocytosis
+        ],
+
+        "Stomach_Specific_Factors": [
+            "SLC9A3",  # Sodium/hydrogen exchanger (acid resistance)
+            "ATP4A",   # Proton pump (acid production)
+            "TFF2",    # Trefoil factor 2 (mucosal protection)
+            "MUC5AC",  # Mucin 5AC (mucosal protection)
+            "CXCL8"    # IL-8, often produced by human stomach macrophages
+        ],
+
+        "Human_Specific_Macrophage_Markers": [
+            "CD16",   # FCGR3A, expressed on some human macrophage subsets
+            "CD32",   # FCGR2A, another Fc receptor on human macrophages
+            "CD64",   # FCGR1A, high-affinity Fc receptor
+            "CD11c",  # ITGAX, expressed on human macrophages and DCs
+            "HLA-DRA" # MHC Class II, for antigen presentation
+        ]
+    }
 
 
-# gene_lists = {
-#     "General_Mononuclear_Phagocyte": [
-#         "CD68",
-#         "CD14",
-#         "CSF1R",
-#         "ITGAM"  # CD11b
-#     ],
+    # Define the gene sets
+    # macrophage_genes = ['CD68', 'CD163', 'MRC1', 'MERTK', 'CSF1R', 'EMR1']
+    # monocyte_genes = ['CD14', 'CCR2', 'S100A8', 'S100A9']
+    # dendritic_genes = ['ITGAX', 'ZBTB46', 'CLEC9A']
 
-#     "Macrophage_Specific": [
-#         "ADGRE1",  # EMR1, human equivalent of F4/80
-#         "CD163",
-#         "MERTK",
-#         "MSR1",   # CD204
-#         "MRC1"    # CD206
-#     ],
+    macrophage_genes = gene_lists['Macrophage_Specific']
+    monocyte_genes = gene_lists['Monocyte_Markers']  + ['CD14']
+    dendritic_genes = gene_lists['Dendritic_Cell_Markers']
 
-#     "Stomach_Tissue_Resident_Macrophage": [
-#         "LYVE1",
-#         "TIMD4",
-#         "GATA6",
-#         "SIGLEC1"  # CD169, often on tissue-resident macrophages
-#     ],
+    # Filter gene lists to include only genes present in the dataset
+    macrophage_genes_filtered = filter_gene_list(adata_temp, macrophage_genes)
+    monocyte_genes_filtered = filter_gene_list(adata_temp, monocyte_genes)
+    dendritic_genes_filtered = filter_gene_list(adata_temp, dendritic_genes)
 
-#     "Monocyte_Markers": [
-#         "FCN1",
-#         "S100A8",
-#         "S100A9",
-#         "CCR2"
-#     ],
+    # Print filtered gene lists (optional)
+    print('Macrophage genes used:', macrophage_genes_filtered)
+    print('Monocyte genes used:', monocyte_genes_filtered)
+    print('Dendritic genes used:', dendritic_genes_filtered)
 
-#     "Dendritic_Cell_Markers": [
-#         "ZBTB46",
-#         "FLT3",
-#         "CD1C",
-#         "CLEC10A"  # CD301, often on human DCs
-#     ],
+    # Calculate module scores for each gene set
+    sc.tl.score_genes(adata_temp, gene_list=macrophage_genes_filtered, score_name='macrophage_score')
+    sc.tl.score_genes(adata_temp, gene_list=monocyte_genes_filtered, score_name='monocyte_score')
+    sc.tl.score_genes(adata_temp, gene_list=dendritic_genes_filtered, score_name='dendritic_score')
 
-#     "Macrophage_Function": [
-#         "MARCO",
-#         "MMP9",
-#         "TIMP3",
-#         "FTL",
-#         "FTH1",
-#         "CD64"     # FCGR1A, important for phagocytosis
-#     ],
+    # Create a DataFrame with the module scores
+    module_scores = adata_temp.obs[['macrophage_score', 'monocyte_score', 'dendritic_score']]
 
-#     "Stomach_Specific_Factors": [
-#         "SLC9A3",  # Sodium/hydrogen exchanger (acid resistance)
-#         "ATP4A",   # Proton pump (acid production)
-#         "TFF2",    # Trefoil factor 2 (mucosal protection)
-#         "MUC5AC",  # Mucin 5AC (mucosal protection)
-#         "CXCL8"    # IL-8, often produced by human stomach macrophages
-#     ],
+    # Calculate the mean module score for each gene set
+    mean_scores = module_scores.mean()
 
-#     "Human_Specific_Macrophage_Markers": [
-#         "CD16",   # FCGR3A, expressed on some human macrophage subsets
-#         "CD32",   # FCGR2A, another Fc receptor on human macrophages
-#         "CD64",   # FCGR1A, high-affinity Fc receptor
-#         "CD11c",  # ITGAX, expressed on human macrophages and DCs
-#         "HLA-DRA" # MHC Class II, for antigen presentation
-#     ]
-# }
+    # Create figure and axes using plt.subplots()
 
 
-# # Define the gene sets
-# # macrophage_genes = ['CD68', 'CD163', 'MRC1', 'MERTK', 'CSF1R', 'EMR1']
-# # monocyte_genes = ['CD14', 'CCR2', 'S100A8', 'S100A9']
-# # dendritic_genes = ['ITGAX', 'ZBTB46', 'CLEC9A']
+    # Plot the mean module scores as a bar plot
+    module_fig, module_ax = plt.subplots(figsize=(8, 6))
+    mean_scores.plot(kind='bar', color=['skyblue', 'salmon', 'lightgreen'])
+    plt.ylabel('Mean Module Score')
+    plt.title('Mean Module Scores for Mononuclear Phagocyte Subtypes')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.show()
 
-# macrophage_genes = gene_lists['Macrophage_Specific']
-# monocyte_genes = gene_lists['Monocyte_Markers']  + ['CD14']
-# dendritic_genes = gene_lists['Dendritic_Cell_Markers']
+    #Panel B
+    customize_figure((module_fig, module_ax), fig_width=2.4, fig_height=3, new_tick_labels={"macrophage_score":"Macrophage Score",
+                                                                                            "monocyte_score":"Monocyte Score",
+                                                                                            "dendritic_score":"Dendritic Cell Score"})
 
-# # Filter gene lists to include only genes present in the dataset
-# macrophage_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], macrophage_genes)
-# monocyte_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], monocyte_genes)
-# dendritic_genes_filtered = filter_gene_list(adata_temp[('mononuclear phagocyte',)], dendritic_genes)
-
-# # Print filtered gene lists (optional)
-# print('Macrophage genes used:', macrophage_genes_filtered)
-# print('Monocyte genes used:', monocyte_genes_filtered)
-# print('Dendritic genes used:', dendritic_genes_filtered)
-
-# # Calculate module scores for each gene set
-# sc.tl.score_genes(adata_temp[('mononuclear phagocyte',)], gene_list=macrophage_genes_filtered, score_name='macrophage_score')
-# sc.tl.score_genes(adata_temp[('mononuclear phagocyte',)], gene_list=monocyte_genes_filtered, score_name='monocyte_score')
-# sc.tl.score_genes(adata_temp[('mononuclear phagocyte',)], gene_list=dendritic_genes_filtered, score_name='dendritic_score')
-
-# # Create a DataFrame with the module scores
-# module_scores = adata_temp[('mononuclear phagocyte',)].obs[['macrophage_score', 'monocyte_score', 'dendritic_score']]
-
-# # Calculate the mean module score for each gene set
-# mean_scores = module_scores.mean()
-
-# # Create figure and axes using plt.subplots()
+    module_fig.savefig('./res/09_figure_5/gene_module_scores_in_phagocytes.svg', format='svg')
 
 
-# # Plot the mean module scores as a bar plot
-# module_fig, module_ax = plt.subplots(figsize=(8, 6))
-# mean_scores.plot(kind='bar', color=['skyblue', 'salmon', 'lightgreen'])
-# plt.ylabel('Mean Module Score')
-# plt.title('Mean Module Scores for Mononuclear Phagocyte Subtypes')
-# plt.xticks(rotation=45)
-# plt.tight_layout()
-# plt.show()
+    # Panel C
+    # Plot and customize the first UMAP (Macrophage Score)
+    fig1 = sc.pl.umap(adata_temp, color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
+    ax1 = fig1.axes[0]
+    customize_scatterplot((fig1, ax1))
+    fig1.savefig('./res/09_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
 
-# #Panel B
-# customize_figure((module_fig, module_ax), fig_width=2.4, fig_height=3, new_tick_labels={"macrophage_score":"Macrophage Score",
-#                                                                                         "monocyte_score":"Monocyte Score",
-#                                                                                         "dendritic_score":"Dendritic Cell Score"})
+    # Plot and customize the second UMAP (Monocyte Score)
+    fig2 = sc.pl.umap(adata_temp, color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
+    ax2 = fig2.axes[0]
+    customize_scatterplot((fig2, ax2))
+    fig2.savefig('./res/09_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
 
-# module_fig.savefig('./res/09_figure_5/gene_module_scores_in_phagocytes.svg', format='svg')
-
-
-# # Panel C
-# # Plot and customize the first UMAP (Macrophage Score)
-# fig1 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
-# ax1 = fig1.axes[0]
-# customize_scatterplot((fig1, ax1))
-# fig1.savefig('./res/09_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
-
-# # Plot and customize the second UMAP (Monocyte Score)
-# fig2 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
-# ax2 = fig2.axes[0]
-# customize_scatterplot((fig2, ax2))
-# fig2.savefig('./res/09_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
-
-# # Plot and customize the third UMAP (Dendritic Cell Score)
-# fig3 = sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
-# ax3 = fig3.axes[0]
-# customize_scatterplot((fig3, ax3))
-# fig3.savefig('./res/09_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
+    # Plot and customize the third UMAP (Dendritic Cell Score)
+    fig3 = sc.pl.umap(adata_temp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
+    ax3 = fig3.axes[0]
+    customize_scatterplot((fig3, ax3))
+    fig3.savefig('./res/09_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
 
 
-# #To confirm which UMAP is which score
-# sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='macrophage_score', title='Macrophage Module Score', vmax='p99')
-# sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='monocyte_score', title='Monocyte Module Score', vmax='p99')
-# sc.pl.umap(adata_temp[('mononuclear phagocyte',)], color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
+    #To confirm which UMAP is which score
+    sc.pl.umap(adata_temp, color='macrophage_score', title='Macrophage Module Score', vmax='p99')
+    sc.pl.umap(adata_temp, color='monocyte_score', title='Monocyte Module Score', vmax='p99')
+    sc.pl.umap(adata_temp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
