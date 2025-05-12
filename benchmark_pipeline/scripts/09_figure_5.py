@@ -167,7 +167,7 @@ def plot_llm_markers_adata_dict(adata, adt_key=None): # pylint: disable=redefine
     fig.savefig(f'./res/09_figure_5/marker_gene_scores_withlegend_{cell_type}.svg', format='svg')
 
     for ax in np.ravel(axes):
-        customize_scatterplot((fig, ax))
+        customize_scatterplot((fig, ax), fig_width=10.5, fig_height=7)
 
     # Save a version of the plot without the legend
     fig.savefig(f'./res/09_figure_5/marker_gene_scores_{cell_type}.svg', format='svg')
@@ -215,10 +215,13 @@ with open('./res/09_figure_5/marker_gene_scores.done', 'w', encoding='utf-8') as
 # adt.display_html_summary(adt.summarize_metadata(adata_dict[('Stomach',)], cols=['donor*cell_ontology_class', 'donor']))
 
 #Also run the manually curated mononuclear phagocyte analysis if present
+# Check if phagocytes are present
+phagocyte_present = 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique() or \
+                    'mononuclear phagocyte' in adata_topleft.obs[manual_cell_type_col].unique()
 
-if 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique():
-
-    adata_temp = adata_topleft[adata_topleft.obs[consistent_manual_cell_type_col].isin(['Phagocyte'])]
+if phagocyte_present:
+    # Filter the adata object to get phagocytes
+    adata_mp = adata_topleft[adata_topleft.obs[manual_cell_type_col].isin(['mononuclear phagocyte'])]
 
     gene_lists = {
         "General_Mononuclear_Phagocyte": [
@@ -294,9 +297,9 @@ if 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique():
     dendritic_genes = gene_lists['Dendritic_Cell_Markers']
 
     # Filter gene lists to include only genes present in the dataset
-    macrophage_genes_filtered = filter_gene_list(adata_temp, macrophage_genes)
-    monocyte_genes_filtered = filter_gene_list(adata_temp, monocyte_genes)
-    dendritic_genes_filtered = filter_gene_list(adata_temp, dendritic_genes)
+    macrophage_genes_filtered = filter_gene_list(adata_mp, macrophage_genes)
+    monocyte_genes_filtered = filter_gene_list(adata_mp, monocyte_genes)
+    dendritic_genes_filtered = filter_gene_list(adata_mp, dendritic_genes)
 
     # Print filtered gene lists (optional)
     print('Macrophage genes used:', macrophage_genes_filtered)
@@ -304,12 +307,12 @@ if 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique():
     print('Dendritic genes used:', dendritic_genes_filtered)
 
     # Calculate module scores for each gene set
-    sc.tl.score_genes(adata_temp, gene_list=macrophage_genes_filtered, score_name='macrophage_score')
-    sc.tl.score_genes(adata_temp, gene_list=monocyte_genes_filtered, score_name='monocyte_score')
-    sc.tl.score_genes(adata_temp, gene_list=dendritic_genes_filtered, score_name='dendritic_score')
+    sc.tl.score_genes(adata_mp, gene_list=macrophage_genes_filtered, score_name='macrophage_score')
+    sc.tl.score_genes(adata_mp, gene_list=monocyte_genes_filtered, score_name='monocyte_score')
+    sc.tl.score_genes(adata_mp, gene_list=dendritic_genes_filtered, score_name='dendritic_score')
 
     # Create a DataFrame with the module scores
-    module_scores = adata_temp.obs[['macrophage_score', 'monocyte_score', 'dendritic_score']]
+    module_scores = adata_mp.obs[['macrophage_score', 'monocyte_score', 'dendritic_score']]
 
     # Calculate the mean module score for each gene set
     mean_scores = module_scores.mean()
@@ -336,25 +339,25 @@ if 'Phagocyte' in adata_topleft.obs[consistent_manual_cell_type_col].unique():
 
     # Panel C
     # Plot and customize the first UMAP (Macrophage Score)
-    fig1 = sc.pl.umap(adata_temp, color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
+    fig1 = sc.pl.umap(adata_mp, color='macrophage_score', title='Macrophage Module Score', vmax='p99', return_fig=True)
     ax1 = fig1.axes[0]
     customize_scatterplot((fig1, ax1))
     fig1.savefig('./res/09_figure_5/macrophage_module_umap_in_phagocytes.svg', format='svg')
 
     # Plot and customize the second UMAP (Monocyte Score)
-    fig2 = sc.pl.umap(adata_temp, color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
+    fig2 = sc.pl.umap(adata_mp, color='monocyte_score', title='Monocyte Module Score', vmax='p99', return_fig=True)
     ax2 = fig2.axes[0]
     customize_scatterplot((fig2, ax2))
     fig2.savefig('./res/09_figure_5/monocyte_module_umap_in_phagocytes.svg', format='svg')
 
     # Plot and customize the third UMAP (Dendritic Cell Score)
-    fig3 = sc.pl.umap(adata_temp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
+    fig3 = sc.pl.umap(adata_mp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99', return_fig=True)
     ax3 = fig3.axes[0]
     customize_scatterplot((fig3, ax3))
     fig3.savefig('./res/09_figure_5/dendritic_module_umap_in_phagocytes.svg', format='svg')
 
 
     #To confirm which UMAP is which score
-    sc.pl.umap(adata_temp, color='macrophage_score', title='Macrophage Module Score', vmax='p99')
-    sc.pl.umap(adata_temp, color='monocyte_score', title='Monocyte Module Score', vmax='p99')
-    sc.pl.umap(adata_temp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
+    sc.pl.umap(adata_mp, color='macrophage_score', title='Macrophage Module Score', vmax='p99')
+    sc.pl.umap(adata_mp, color='monocyte_score', title='Monocyte Module Score', vmax='p99')
+    sc.pl.umap(adata_mp, color='dendritic_score', title='Dendritic Cell Module Score', vmax='p99')
