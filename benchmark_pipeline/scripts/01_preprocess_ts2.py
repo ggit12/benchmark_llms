@@ -94,7 +94,7 @@ print("Memory before deletion:", psutil.virtual_memory())
 gc.collect()
 print("Memory after deletion:", psutil.virtual_memory())
 
-# Optionally, you might subset the data to only high-variance genes
+# Subset the data to only high-variance genes
 adt.wrappers.set_high_variance_genes_adata_dict(adata_dict, n_top_genes=2000, subset=False, use_multithreading=False)
 print("Set high variance genes")
 print("Memory before deletion:", psutil.virtual_memory())
