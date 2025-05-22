@@ -40,7 +40,7 @@ llm_config['model'] = os.environ['MODEL_FOR_POST_PROCESSING']
 adt.configure_llm_backend(**llm_config)
 
 # Read the merged AnnData
-adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
+adata = sc.read_h5ad('./res/03_gather_results/adt_de_novo_llm_annotated.h5ad')
 
 
 #get cell type columns
@@ -101,7 +101,7 @@ base_path = './res/04_postprocess_results/'
 
 #adata
 # del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
-adata.write_h5ad(base_path + 'ts2_de_novo_llm_annotated.h5ad')
+adata.write_h5ad(base_path + 'adt_de_novo_llm_annotated.h5ad')
 print("Wrote adata", flush=True)
 
 #label_map_with_manual

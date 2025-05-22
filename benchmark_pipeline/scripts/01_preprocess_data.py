@@ -150,7 +150,7 @@ gc.collect()
 print("Memory after deletion:", psutil.virtual_memory())
 
 # Write the preprocessed AdataDict
-adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
+adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt")
 print("Wrote preprocessed AdataDict")
 
 # Write the manual cell type column as pickle
