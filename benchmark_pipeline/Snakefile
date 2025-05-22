@@ -41,7 +41,7 @@ rule all:
         #to trigger o7
         expand("res/{run}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", run=RUN_DIRS),
         # These files below won't run unless on the bigger object
-        expand("res/{run}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", run=RUN_DIRS),
+        # expand("res/{run}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", run=RUN_DIRS),
 
         # Final aggregated results
         # -------------------------
@@ -254,14 +254,14 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/07_figure_3_and_s2/agreement_scatterplot_largest_celltypes_top_llms.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
             # These files below won't run unless on the bigger object
-            f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done",
-            f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
-            f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_done",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_basal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/epithelial_module_umap_in_basal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/basal_module_umap_in_basal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/gene_module_scores_in_stromal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
+            # f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
         resources:
             partition="cpu",
             mem="600G",
