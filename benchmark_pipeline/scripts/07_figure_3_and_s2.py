@@ -38,7 +38,7 @@ from src import REMOVE_TICK_LABELS as remove_tick_labels
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad")
 
 # And the various column names
 manual_cell_type_col = pickle.load(

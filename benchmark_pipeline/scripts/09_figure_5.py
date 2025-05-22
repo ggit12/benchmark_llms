@@ -54,7 +54,7 @@ llm_config['model'] = os.environ['MODEL_FOR_POST_PROCESSING']
 adt.configure_llm_backend(**llm_config)
 
 # Read the results
-adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad")
 
 # Read the agreement_df and agreement_weights_df
 agreement_df = pickle.load(open("./res/08_figure_4/agreement_df.pkl", "rb"))

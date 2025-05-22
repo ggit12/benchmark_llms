@@ -1,5 +1,5 @@
 """
-This script preprocesses the TSPv2 dataset for annotation benchmarking.
+This script preprocesses the dataset for annotation benchmarking.
 
 Runs from the root of the benchmark_pipeline directory.
 """

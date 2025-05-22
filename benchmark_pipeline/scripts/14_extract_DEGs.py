@@ -14,7 +14,7 @@ import pandas as pd
 
 # Load the adata_dict
 print("Loading adata_dict", flush=True)
-adata_dict = adt.read_adata_dict('./dat/preprocessed_tissue_adt_ts2')
+adata_dict = adt.read_adata_dict('./dat/preprocessed_tissue_adt')
 print("Loaded adata_dict", flush=True)
 
 #Extract the differentially expressed genes for each cluster of each tissue
