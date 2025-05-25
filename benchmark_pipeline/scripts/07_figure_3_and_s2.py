@@ -216,19 +216,19 @@ agreement_scatterplot_large_celltypes[0].savefig(
     format="svg",
 )
 
+# record the cell types that are closest to the top-left corner as a txt
+with open(
+    "./res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
+    "w", encoding="utf-8",
+) as f:
+    f.write(
+        "Large cell types of interest in the top left corner of the agreement plot:\n"
+    )
+    for celltype in celltypes_of_interest_large_celltypes["top_left"]:
+        f.write(f"{celltype}\n")
+
 
 # TODO: Code below here won't run unless on full object
-# # record the cell types that are closest to the top-left corner as a txt
-# with open(
-#     "./res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
-#     "w", encoding="utf-8",
-# ) as f:
-#     f.write(
-#         "Large cell types of interest in the top left corner of the agreement plot:\n"
-#     )
-#     for celltype in celltypes_of_interest_large_celltypes["top_left"]:
-#         f.write(f"{celltype}\n")
-
 
 # # get adata_dict of celltypes closest to top-left (of the largest cell types)
 # adata_top_left_cells = adt.build_adata_dict(
