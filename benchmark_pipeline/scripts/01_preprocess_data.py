@@ -33,6 +33,13 @@ for key in ['decontXcounts', 'log_normalized', 'scale_data']:
     if key in adata.layers:
         del adata.layers[key]
 
+#Ensure that raw counts is int32
+if 'raw_counts' in adata.layers:
+    adata.layers['raw_counts'] = adata.layers['raw_counts'].astype('int32')
+# If raw_counts is not present, raise an error
+if 'raw_counts' not in adata.layers:
+    raise ValueError("The 'raw_counts' layer is not present in the AnnData object. Please ensure that the data is loaded correctly.")
+
 #set X to be raw_counts
 adata.X = adata.layers['raw_counts'].copy()
 
@@ -49,9 +56,12 @@ protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end
 #filter adata to only include protein coding genes
 adata = adata[:, adata.var.index.isin(protein_coding)].copy()
 
+#make a tissue column if it doesn't exist
+if 'tissue' not in adata.obs.columns:
+    adata.obs['tissue'] = adata.obs['organ_tissue'].copy()
+
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
-
 
 #remove a standard list of uninformative genes
 abundant_rnas = [
