@@ -62,6 +62,9 @@ rule all:
         #to trigger o14
         "res/14_extract_DEGs/DEG_frequencies.txt",
 
+        #to trigger o15
+        "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg",
+
 
 # Preprocess rule - only run once
 rule o1_preprocess_data:
@@ -442,4 +445,24 @@ rule o14_extract_DEGs:
     shell:
         """
         python scripts/14_extract_DEGs.py
+        """
+
+
+rule o15_aggregate_agreement_plots_tissue:
+    input:
+        tables=expand("res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue.pkl", run_dir=RUN_DIRS),
+        tables_perfect_only=expand("res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl", run_dir=RUN_DIRS),
+    output:
+        "res/15_aggregated_plots_tissue/agreement_plot_by_tissue.svg",
+        "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg",
+    resources:
+        partition="cpu",
+        mem="32G",
+        runtime=60,
+        ntasks=1,
+    shell:
+        """
+        python scripts/15_aggregate_agreement_plots_tissue.py \
+            --input-tables {input.tables} \
+            --input-tables-perfect-only {input.tables_perfect_only} \
         """
