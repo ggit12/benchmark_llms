@@ -109,12 +109,12 @@ agreement_plot_by_tissue_categorical_perfect_only[0].savefig(
 )
 
 # Extract values from the plot
-agreement_table_overall_categorical_perfect_top_celltypes = extract_table_from_fig(
+agreement_table_by_tissue_categorical_perfect_only = extract_table_from_fig(
     agreement_plot_by_tissue_categorical_perfect_only,
     value_col_name="Perfect Match (% of Cells)",
-    x_tick_label_name="Cell Type",)
+    x_tick_label_name="Tissue",)
 
 # Write for later aggregation
-agreement_table_overall_categorical_perfect_top_celltypes.to_pickle(
+agreement_table_by_tissue_categorical_perfect_only.to_pickle(
     "./res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl"
 )
