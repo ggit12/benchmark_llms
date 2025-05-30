@@ -60,7 +60,7 @@ llm_celltype_cols_top_models = pickle.load(
 agreement_plot_by_tissue = adt.plot_model_agreement(
     adata,
     group_by="tissue",
-    sub_group_by="tissue", #this arg is ignored when granularity=1
+    sub_group_by="consistent_including_manual_" + manual_cell_type_col, #this arg is ignored when granularity=1
     agreement_cols=binary_agreement_cols_top_models,
     granularity=1,
 )
@@ -91,7 +91,7 @@ agreement_table_by_tissue.to_pickle(
 agreement_plot_by_tissue_categorical_perfect_only = adt.plot_model_agreement(
     adata,
     group_by="tissue",
-    sub_group_by="tissue",
+    sub_group_by="consistent_including_manual_" + manual_cell_type_col,  # this arg is ignored when granularity=1
     agreement_cols=perfect_only_categorical_agreement_cols_top_models,
     granularity=1,
 )
@@ -109,12 +109,12 @@ agreement_plot_by_tissue_categorical_perfect_only[0].savefig(
 )
 
 # Extract values from the plot
-agreement_table_overall_categorical_perfect_top_celltypes = extract_table_from_fig(
+agreement_table_by_tissue_categorical_perfect_only = extract_table_from_fig(
     agreement_plot_by_tissue_categorical_perfect_only,
     value_col_name="Perfect Match (% of Cells)",
-    x_tick_label_name="Cell Type",)
+    x_tick_label_name="Tissue",)
 
 # Write for later aggregation
-agreement_table_overall_categorical_perfect_top_celltypes.to_pickle(
+agreement_table_by_tissue_categorical_perfect_only.to_pickle(
     "./res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl"
 )
