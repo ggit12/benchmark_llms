@@ -53,7 +53,7 @@ def create_tissue_model_plot(performance_df, perfect_match=False):
     column_prefix = "Perfect Match (% of Cells)_perfect_only_categorical_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_" \
         if perfect_match else \
             "Overall Binary (% of Cells)_binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_"
-    column_suffix = "_simplified_ai_tissue"
+    column_suffix = "_simplified_ai_cell_type"
 
     # Get the model names from the columns
     model_columns = [col for col in performance_df.columns if col.startswith(column_prefix)]
@@ -214,7 +214,7 @@ def main():
     customize_figure(
         agreement_plot,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_tissue"],
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
         fig_width=4.8,
         fig_height=3,
     )
@@ -248,7 +248,7 @@ def main():
     customize_figure(
         agreement_plot_perfect_only,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_tissue"],
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
         fig_width=4.8,
         fig_height=3,
     )
