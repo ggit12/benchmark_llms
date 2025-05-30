@@ -38,6 +38,8 @@ rule all:
         expand("res/{run}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg", run=RUN_DIRS),
         #to trigger o6
         expand("res/{run}/res/06_figure_s1/done", run=RUN_DIRS),
+        #to trigger o6b
+        expand("res/{run}/res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl", run=RUN_DIRS),
         #to trigger o7
         expand("res/{run}/res/07_figure_3_and_s2/agreement_plots_by_tissue_celltype_top_celltypes_done", run=RUN_DIRS),
         # These files below won't run unless on the bigger object
