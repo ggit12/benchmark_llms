@@ -1,5 +1,5 @@
 """
-Aggregates agreement plots of the top models for the largest cell types from multiple runs.
+Aggregates agreement plots of the top models for the largest tissues from multiple runs.
 """
 # pylint: disable=line-too-long
 
@@ -27,17 +27,17 @@ from src import (
 
 from src import MODEL_TICK_LABELS as model_tick_labels
 
-#define a global variable to store sorted cell types for consistent ordering across plots
-sorted_cell_types = None  # pylint: disable=invalid-name
+#define a global variable to store sorted tissues for consistent ordering across plots
+sorted_tissues = None  # pylint: disable=invalid-name
 
-def create_cell_type_model_plot(performance_df, perfect_match=False):
+def create_tissue_model_plot(performance_df, perfect_match=False):
     """
-    Create a grouped bar plot with cell types as major groups and models as subgroups.
+    Create a grouped bar plot with tissues as major groups and models as subgroups.
 
     Parameters:
     -----------
     performance_df : DataFrame
-        Agreement data for plotting with cell types as index.
+        Agreement data for plotting with tissues as index.
     perfect_match : bool
         If True, use the perfect match data, otherwise use overall binary data.
 
@@ -46,14 +46,14 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     tuple
         (fig, ax) for the plot.
     """
-    # Reset index to make cell types a column
+    # Reset index to make tissues a column
     plot_df = performance_df.reset_index()
 
     # Column prefix based on perfect_match parameter
     column_prefix = "Perfect Match (% of Cells)_perfect_only_categorical_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_" \
         if perfect_match else \
             "Overall Binary (% of Cells)_binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_"
-    column_suffix = "_simplified_ai_cell_type"
+    column_suffix = "_simplified_ai_tissue"
 
     # Get the model names from the columns
     model_columns = [col for col in performance_df.columns if col.startswith(column_prefix)]
@@ -62,30 +62,30 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     # Create a DataFrame for plotting
     plot_data = []
     for _, row in plot_df.iterrows():
-        cell_type = row['Tissue']  # The index was named 'Model' in the original DataFrame
+        tissue = row['Tissue']  # The index was named 'Model' in the original DataFrame
 
         for col, model_name in zip(model_columns, model_names):
             plot_data.append({
-                'cell_type': cell_type,
+                'tissue': tissue,
                 'model_name': model_name,
                 'agreement': row[col]
             })
 
     plot_df = pd.DataFrame(plot_data)
 
-    # Sort cell types based on their mean agreement value across all models
+    # Sort tissues based on their mean agreement value across all models
     # Keep the order the same as the first plot for ease of comparison on plots
-    first_plot = 'sorted_cell_types' not in globals()  # Check if this is the first plot
+    first_plot = 'sorted_tissues' not in globals()  # Check if this is the first plot
     if first_plot:
-        global sorted_cell_types # pylint: disable=global-statement
-        sorted_cell_types = plot_df.groupby('cell_type')['agreement'].mean().sort_values(ascending=False).index.tolist()
+        global sorted_tissues # pylint: disable=global-statement
+        sorted_tissues = plot_df.groupby('tissue')['agreement'].mean().sort_values(ascending=False).index.tolist()
     else:
         pass
 
 
-    # Convert cell_type to categorical with specific order
-    plot_df['cell_type'] = pd.Categorical(
-        plot_df['cell_type'], categories=sorted_cell_types, ordered=True # pylint: disable=possibly-used-before-assignment
+    # Convert tissue to categorical with specific order
+    plot_df['tissue'] = pd.Categorical(
+        plot_df['tissue'], categories=sorted_tissues, ordered=True # pylint: disable=possibly-used-before-assignment
     )
 
     # Create the plot
@@ -97,12 +97,12 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     # Plot the aggregated bars
     sns.barplot(
         data=plot_df,
-        x='cell_type',
+        x='tissue',
         y='agreement',
         hue='model_name',
         palette=palette,
         ax=ax,
-        order=sorted_cell_types,
+        order=sorted_tissues,
         errorbar='sd',
         capsize=0.2,
         err_kws={"linewidth": 0.5, "color": "black"},
@@ -111,12 +111,12 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     # Add individual data points
     sns.stripplot(
         data=plot_df,
-        x='cell_type',
+        x='tissue',
         y='agreement',
         hue='model_name',
         dodge=True,
         ax=ax,
-        order=sorted_cell_types,
+        order=sorted_tissues,
         alpha=1.0,
         size=1.5,
         color="black",
@@ -151,13 +151,13 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Create agreement plots for largest cell types."
+        description="Create agreement plots for largest tissues."
     )
     parser.add_argument(
         "--input-tables",
         nargs="+",
         required=True,
-        help="Input agreement table pickle files for largest cell types",
+        help="Input agreement table pickle files for largest tissues",
     )
     parser.add_argument(
         "--input-tables-perfect-only",
@@ -191,8 +191,8 @@ def main():
 
 
     # Create overall binary agreement plot
-    # Create agreement plot for largest cell types
-    agreement_plot = create_cell_type_model_plot(
+    # Create agreement plot for largest tissues
+    agreement_plot = create_tissue_model_plot(
         agreement_tables, perfect_match=False
     )
 
@@ -214,7 +214,7 @@ def main():
     customize_figure(
         agreement_plot,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_tissue"],
         fig_width=4.8,
         fig_height=3,
     )
@@ -226,7 +226,7 @@ def main():
 
 
     # Create perfect match agreement plot
-    agreement_plot_perfect_only = create_cell_type_model_plot(
+    agreement_plot_perfect_only = create_tissue_model_plot(
         agreement_tables_perfect, perfect_match=True
     )
 
@@ -248,7 +248,7 @@ def main():
     customize_figure(
         agreement_plot_perfect_only,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_tissue"],
         fig_width=4.8,
         fig_height=3,
     )
