@@ -60,7 +60,7 @@ llm_celltype_cols_top_models = pickle.load(
 agreement_plot_by_tissue = adt.plot_model_agreement(
     adata,
     group_by="tissue",
-    sub_group_by="tissue", #this arg is ignored when granularity=1
+    sub_group_by="consistent_including_manual_" + manual_cell_type_col, #this arg is ignored when granularity=1
     agreement_cols=binary_agreement_cols_top_models,
     granularity=1,
 )
@@ -91,7 +91,7 @@ agreement_table_by_tissue.to_pickle(
 agreement_plot_by_tissue_categorical_perfect_only = adt.plot_model_agreement(
     adata,
     group_by="tissue",
-    sub_group_by="tissue",
+    sub_group_by="consistent_including_manual_" + manual_cell_type_col,  # this arg is ignored when granularity=1
     agreement_cols=perfect_only_categorical_agreement_cols_top_models,
     granularity=1,
 )
