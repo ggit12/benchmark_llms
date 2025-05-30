@@ -215,7 +215,7 @@ def main():
         agreement_plot,
         remove_legend=True,
         x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
-        fig_width=2.4,
+        fig_width=4.8,
         fig_height=3,
     )
 
@@ -249,7 +249,7 @@ def main():
         agreement_plot_perfect_only,
         remove_legend=True,
         x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
-        fig_width=2.4,
+        fig_width=4.8,
         fig_height=3,
     )
 
