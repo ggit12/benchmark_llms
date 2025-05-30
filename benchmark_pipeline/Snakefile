@@ -237,6 +237,32 @@ for run_dir in RUN_DIRS:
             cd res/{params.run} && python ../../scripts/06_figure_s1.py
             """
 
+    # Rule for figure S3
+    rule:
+        name: f"o6b_figure_s3_{run_dir}"
+        input:
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl'
+        output:
+            f"res/{run_dir}/res/06b_figure_s3/agreement_plot_by_tissue.svg",
+            f"res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue.pkl",
+            f"res/{run_dir}/res/06b_figure_s3/agreement_plot_by_tissue_perfect_only.svg",
+            f"res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl",
+        resources:
+            partition="cpu",
+            mem="400G",
+            cpus=30,
+            runtime=60,
+            ntasks=1,
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/06b_figure_s3.py
+            """
+
     # Rule for figure 3 and S2
     rule:
         name: f"o7_figure_3_and_s2_{run_dir}"
