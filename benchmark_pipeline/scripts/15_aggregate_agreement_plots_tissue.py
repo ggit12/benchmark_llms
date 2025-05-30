@@ -62,7 +62,7 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
     # Create a DataFrame for plotting
     plot_data = []
     for _, row in plot_df.iterrows():
-        cell_type = row['Cell Type']  # The index was named 'Model' in the original DataFrame
+        cell_type = row['Tissue']  # The index was named 'Model' in the original DataFrame
 
         for col, model_name in zip(model_columns, model_names):
             plot_data.append({
@@ -139,7 +139,7 @@ def create_cell_type_model_plot(performance_df, perfect_match=False):
 
     # Set labels and title
     plot_type = "Perfect Match" if perfect_match else "Binary"
-    ax.set_xlabel("Cell Type")
+    ax.set_xlabel("Tissue")
     ax.set_ylabel(f"{plot_type}\n(Proportion)")
     ax.set_title("Agreemet\n(with manual annotation)")
     ax.set_ylim(0, 1.05)
