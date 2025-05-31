@@ -84,7 +84,7 @@ perfect_only_categorical_agreement_cols_top_models = pickle.load(
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl", "rb")
 )
 
 cm_colorbar_df = agreement_df.join(agreement_weights_df.rename('agreement_weight'))
