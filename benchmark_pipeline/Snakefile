@@ -312,7 +312,7 @@ for run_dir in RUN_DIRS:
         input:
             f'dat/manual_cell_type_col.pkl',
             f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
-            f"res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl",
+            f"res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl"
