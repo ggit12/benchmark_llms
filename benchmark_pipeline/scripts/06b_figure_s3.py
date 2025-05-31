@@ -51,11 +51,11 @@ llm_celltype_cols_top_models = pickle.load(
     open("./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl", "rb")
 )
 
-# # Set the AI cell type column to the best performing model by overall binary agreement (the first element in './res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl')
-ai_cell_type_col = llm_celltype_cols_top_models[0]
-
 # Make bar plots by tissue as well
 
+# Panel A
+
+# Top of A
 # plot the binary agreement
 agreement_plot_by_tissue = adt.plot_model_agreement(
     adata,
@@ -119,16 +119,24 @@ agreement_table_by_tissue_categorical_perfect_only.to_pickle(
     "./res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl"
 )
 
+#get lowest tissues by binary agreement
+lowest_tissues = agreement_table_by_tissue.mean(axis=1).nsmallest(3).index.tolist()
+lowest_tissues_as_keys = [(i,) for i in lowest_tissues]
+
 # For the tissues with lowest agreement, how were the cells annotated?
-sankey_ai_to_man_basal_cells = adt.plot_sankey(
-    adata[("Ear",)],
+ai_cell_type_col = llm_celltype_cols_top_models[0] #set as the highest binary agreement model
+
+adata_dict = adt.build_adata_dict(adata, strata_keys=['tissue'], desired_strata=lowest_tissues_as_keys)
+
+sankey_ai_to_man = adt.wrappers.plot_sankey_adata_dict(
+    adata_dict,
     cols=[manual_cell_type_col]
     + [
         ai_cell_type_col
     ],
     # params={'edge_color': "grey"}
 )
-adt.save_sankey(
-    sankey_ai_to_man_basal_cells,
-    filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",  # Dynamic filename for each plot
+adt.wrappers.save_sankey_adata_dict(
+    sankey_ai_to_man,
+    filename="./res/06b_figure_s3/sankey_ai_to_manual_lowest_tissues.svg",  # Dynamic filename for each plot
 )
