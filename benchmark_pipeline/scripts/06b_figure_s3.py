@@ -118,3 +118,25 @@ agreement_table_by_tissue_categorical_perfect_only = extract_table_from_fig(
 agreement_table_by_tissue_categorical_perfect_only.to_pickle(
     "./res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl"
 )
+
+#get lowest tissues by binary agreement
+lowest_tissues = agreement_table_by_tissue.mean(axis=1).nsmallest(3).index.tolist()
+lowest_tissues_as_keys = [(i,) for i in lowest_tissues]
+
+# For the tissues with lowest agreement, how were the cells annotated?
+ai_cell_type_col = llm_celltype_cols_top_models[0] #set as the highest binary agreement model
+
+adata_dict = adt.build_adata_dict(adata, strata_keys=['tissue'], desired_strata=lowest_tissues_as_keys)
+
+sankey_ai_to_man = adt.wrappers.plot_sankey_adata_dict(
+    adata_dict,
+    cols=[manual_cell_type_col]
+    + [
+        ai_cell_type_col
+    ],
+    # params={'edge_color': "grey"}
+)
+adt.wrappers.save_sankey_adata_dict(
+    sankey_ai_to_man,
+    filename="./res/06b_figure_s3/sankey_ai_to_manual_lowest_tissues.svg",  # Dynamic filename for each plot
+)
