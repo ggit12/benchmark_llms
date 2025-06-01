@@ -163,7 +163,7 @@ consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_t
 kappa_with_manual = adt.kappa_adata(adata, llm_celltype_cols + [consistent_manual_cell_type_col])
 
 # calculate alpha
-alpha = adt.krippendorff_alpha_adata(adata, llm_celltype_cols)
+# alpha = adt.krippendorff_alpha_adata(adata, llm_celltype_cols)
 
 # For kappa values
 def extract_kappa_pairs(data_dict, column_name, substring_to_remove, replace_dict):
