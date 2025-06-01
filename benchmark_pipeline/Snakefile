@@ -213,7 +213,7 @@ for run_dir in RUN_DIRS:
         resources:
             slurm_partition="gpu",
             gpu=1,
-            mem="1200G",
+            mem="1500G",
             runtime=300,
             ntasks=1,
         params:
