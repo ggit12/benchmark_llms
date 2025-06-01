@@ -176,7 +176,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="600G",
             runtime=300,
             ntasks=1,
@@ -210,7 +211,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.html',
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="1200G",
             runtime=300,
             ntasks=1,
@@ -230,7 +232,8 @@ for run_dir in RUN_DIRS:
         output:
             f"res/{run_dir}/res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -256,7 +259,8 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/06b_figure_s3/agreement_plot_by_tissue_perfect_only.svg",
             f"res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl",
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             runtime=60,
@@ -294,7 +298,8 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -322,7 +327,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
             f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl',
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             time=120,
@@ -351,7 +357,8 @@ for run_dir in RUN_DIRS:
             # f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
             # f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
         resources:
-            partition="cpu",
+            partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -438,7 +445,8 @@ rule o14_extract_DEGs:
         "res/14_extract_DEGs/DEGs.pkl",
         "res/14_extract_DEGs/DEG_frequencies.txt",
     resources:
-        partition="cpu",
+        partition="gpu",
+        gpu=1,
         mem="400G",
         runtime=60,
         ntasks=1,
