@@ -501,3 +501,6 @@ customize_scatterplot((stromal_fig, stromal_ax))
 stromal_fig.savefig(
     "./res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", format="svg"
 )
+
+# explicitly shut down python
+sys.exit(0)
