@@ -46,9 +46,6 @@ binary_agreement_cols_top_models = pickle.load(
 )
 
 
-# Initialize an empty list to store the generated plots
-agreement_plots_by_tissue_celltype = []
-
 # Loop over the binary agreement columns and generate a plot for each
 for col in binary_agreement_cols_top_models:
     agreement_plot = adt.plot_model_agreement(
@@ -57,6 +54,17 @@ for col in binary_agreement_cols_top_models:
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
+    )
+
+    # Write a version of the plot with the legend
+    model_used = col.replace(
+        "binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_",
+        "",
+    )
+
+    agreement_plot[0].savefig(
+        f"res/06_figure_s1/agreement_plot_tissue_celltype_{model_used}_withlegend.svg",
+        format="svg",
     )
 
     agreement_plot_custom = customize_clustermap(
@@ -74,14 +82,7 @@ for col in binary_agreement_cols_top_models:
         new_tick_labels=remove_tick_labels,
     )
 
-    # Append the customized plot to the list
-    agreement_plots_by_tissue_celltype.append(agreement_plot_custom)
-
-    # write the plot
-    model_used = col.replace(
-        "binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_",
-        "",
-    )
+    # write the plot without the legend
     agreement_plot_custom[0].savefig(
         f"res/06_figure_s1/agreement_plot_tissue_celltype_{model_used}.svg",
         format="svg",
