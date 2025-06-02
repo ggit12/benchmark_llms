@@ -140,6 +140,7 @@ for col in binary_agreement_cols_top_models:
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
+        legend=True,
     )
 
     # Write a version of the plot with the legend
