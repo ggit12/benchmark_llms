@@ -150,7 +150,7 @@ for col in binary_agreement_cols_top_models:
     )
 
     agreement_plot_temp.fig.savefig(
-        f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_withlegend.svg",
+        f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes_withlegend.svg",
         format="svg",
     )
 
