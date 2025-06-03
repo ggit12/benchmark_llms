@@ -26,6 +26,7 @@ from src import (
     cell_type_by_plurality,
     PROVIDERS,
     # ensure_label_consistency_adata,
+    direct_compare_cell_type_labels_pairwise,
 )
 
 
@@ -93,6 +94,14 @@ perfect_only_categorical_agreement_cols = ["perfect_only_" + col for col in cate
 adata.obs[perfect_only_categorical_agreement_cols] = adata.obs[categorical_agreement_cols].replace(0.5, 0)
 print("Calculated perfect only categorical agreement", flush=True)
 
+#assess the agreement using direct string comparison
+direct_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='direct_string_agreement')
+print("Calculated direct string agreement", flush=True)
+
+# get these column names
+direct_string_agreement_cols = adt.get_adata_columns(adata, contains=['direct_string_agreement_consistent_including_manual'])
+
+
 # Write out all generated objects
 base_path = './res/04_postprocess_results/'
 
@@ -118,4 +127,5 @@ pickle.dump(llm_celltype_cols, open(base_path + 'llm_celltype_cols.pkl', 'wb'))
 pickle.dump(binary_agreement_cols, open(base_path + 'binary_agreement_cols.pkl', 'wb'))
 pickle.dump(categorical_agreement_cols, open(base_path + 'categorical_agreement_cols.pkl', 'wb'))
 pickle.dump(perfect_only_categorical_agreement_cols, open(base_path + 'perfect_only_categorical_agreement_cols.pkl', 'wb'))
+pickle.dump(direct_string_agreement_cols, open(base_path + 'direct_string_agreement_cols.pkl', 'wb'))
 print("Wrote all outputs", flush=True)

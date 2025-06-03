@@ -174,7 +174,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
         resources:
             slurm_partition="gpu",
             gpu=1,
@@ -205,6 +206,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa.pkl',
