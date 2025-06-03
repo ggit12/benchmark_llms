@@ -57,22 +57,28 @@ rule all:
         #to trigger o13
         # "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
 
+        #to trigger o14
+        "res/14_extract_DEGs/DEG_frequencies.txt",
+
+        #to trigger o15
+        "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg",
+
 
 # Preprocess rule - only run once
-rule o1_preprocess_ts2:
+rule o1_preprocess_data:
     input:
         os.environ["INPUT_DATA"]
     output:
-        directory("dat/preprocessed_tissue_adt_ts2"),
+        directory("dat/preprocessed_tissue_adt"),
         'dat/manual_cell_type_col.pkl',
     resources: # sbatch flag to which snakemake maps
-        partition="cpu", # --partition
+        slurm_partition="cpu", # --partition
         mem="800G", # --mem
         # cpus=30, # --cpus-per-task
         runtime=240, # --time
         tasks=1, # --ntasks
     shell:
-        "python scripts/01_preprocess_ts2.py"
+        "python scripts/01_preprocess_data.py"
 
 def make_existing_provider_pkls(run_dir, provider):
     """
@@ -109,13 +115,13 @@ for run_dir in RUN_DIRS:
         rule:
             name: f"o2_run_{provider}_{run_dir}"
             input:
-                "dat/preprocessed_tissue_adt_ts2",  # Use the same preprocessed data for all runs
+                "dat/preprocessed_tissue_adt",  # Use the same preprocessed data for all runs
                 f"res/{run_dir}/res/02_run_provider/{provider}_cache_done"  # Depend on cache rule
             output:
                 expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
             resources:
-                partition="cpu",
+                slurm_partition="cpu",
                 mem_mb=600000,
                 # cpus=30,
                 runtime=480,
@@ -128,7 +134,7 @@ for run_dir in RUN_DIRS:
                 """
                 mkdir -p res/{params.run} && \
                 cd res/{params.run} && \
-                python ../../scripts/02_run_provider.py --provider {params.provider} --input ../../dat/preprocessed_tissue_adt_ts2 --outdir res/02_run_provider
+                python ../../scripts/02_run_provider.py --provider {params.provider} --input ../../dat/preprocessed_tissue_adt --outdir res/02_run_provider
                 """
 
     # Gather results for all providers and models
@@ -139,9 +145,9 @@ for run_dir in RUN_DIRS:
                     for provider, models in ENDPOINTS.endpoints.items()
                     for model in models]
         output:
-            f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
+            f'res/{run_dir}/res/03_gather_results/adt_de_novo_llm_annotated.h5ad'
         resources:
-            partition="cpu",
+            slurm_partition="cpu",
             mem_mb=800000,
             # cpus=30,
             runtime=300,
@@ -157,18 +163,20 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o4_postprocess_results_{run_dir}"
         input:
-            f'res/{run_dir}/res/03_gather_results/ts2_de_novo_llm_annotated.h5ad'
+            f'res/{run_dir}/res/03_gather_results/adt_de_novo_llm_annotated.h5ad'
         output:
-            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             # f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
             f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
             f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
             f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="600G",
             runtime=300,
             ntasks=1,
@@ -184,7 +192,7 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o5_figure_2_and_table_2_{run_dir}"
         input:
-            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad'
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad'
         output:
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
@@ -205,7 +213,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.html',
         resources:
-            partition="cpu",
+            slurm_partition="cpu",
             mem="1000G",
             runtime=300,
             ntasks=1,
@@ -220,12 +228,13 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o6_figure_s1_{run_dir}"
         input:
-            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl'
         output:
             f"res/{run_dir}/res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -241,7 +250,7 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o7_figure_3_and_s2_{run_dir}"
         input:
-            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl'
@@ -262,7 +271,8 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
             f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg"
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -279,7 +289,7 @@ for run_dir in RUN_DIRS:
         name: f"o8_figure_4_{run_dir}"
         input:
             f'dat/manual_cell_type_col.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f"res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl",
@@ -290,7 +300,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
             f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             time=120,
@@ -306,7 +317,7 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o9_figure_5_{run_dir}"
         input:
-            f"res/{run_dir}/res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad",
+            f"res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad",
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
             f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
         output:
@@ -318,7 +329,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
             f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="600G",
             cpus=30,
             runtime=60,
@@ -338,7 +350,7 @@ rule o10_aggregate_tables:
         "res/10_aggregated_tables/aggregated_performance_table_std.pkl",
         "res/10_aggregated_tables/aggregated_performance_table.html",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -354,7 +366,7 @@ rule o11_aggregate_kappa:
         "res/11_aggregated_kappa/kappa_mean.svg",
         "res/11_aggregated_kappa/kappa_sd.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -368,7 +380,7 @@ rule o12_aggregate_agreement_plots:
         "res/12_aggregated_agreement_plots/agreement_plot_categorical.svg",
         "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1
@@ -386,7 +398,7 @@ rule o13_aggregate_agreement_plots_largest_celltypes:
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes.svg",
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,

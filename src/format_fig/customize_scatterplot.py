@@ -12,6 +12,8 @@ def customize_scatterplot(
     new_ylabel=None,
     new_xlabel=None,
     fig_size=3.5,
+    fig_width=None,
+    fig_height=None,
     preserve_sizes=True,
 ):
     """
@@ -52,8 +54,11 @@ def customize_scatterplot(
     fig, ax = fig_tuple
 
     # Set figure size to slightly less than 90mm wide and 90mm tall to include bounding box
+    if fig_width is None and fig_height is None:
+        fig_width = fig_size
+        fig_height = fig_size
     fig.set_size_inches(
-        fig_size, fig_size
+        fig_width, fig_height
     )  # 90mm = 3.54331 inches, slightly smaller to account for labels
 
     # Set font size to 5pt, font weight to bold, and font family to Arial or sans-serif fallback
