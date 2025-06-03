@@ -129,7 +129,7 @@ agreement_table_overall_categorical_perfect = extract_table_from_fig(agreement_p
 #This is Figure 2A
 agreement_plot_overall_categorical = adt.plot_model_agreement_categorical(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=categorical_agreement_cols, granularity=0)
 customize_figure(agreement_plot_overall_categorical, remove_legend = True,
-                 x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'],
+                 x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'],
                  new_ylabel='Agreement with Manual Annotation (by level of agreement)', remove_bar_labels=True,
                  fig_width=2.4,
                  fig_height=3,
