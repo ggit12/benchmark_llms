@@ -103,10 +103,6 @@ customize_figure(agreement_plot_overall_binary, remove_legend = True, x_tick_sub
  #Save the plot as an SVG file
 agreement_plot_overall_binary[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg', format='svg')
 
-# Example usage (assuming fig_tuple is the figure/axes tuple):
-# html_table = extract_table_to_html(fig_tuple)
-# print(html_table)
-
 agreement_table_overall_binary = extract_table_from_fig(agreement_plot_overall_binary, value_col_name='Overall Binary (% of Cells)')
 
 
