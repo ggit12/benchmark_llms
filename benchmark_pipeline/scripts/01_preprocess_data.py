@@ -47,7 +47,7 @@ with open(protein_coding_path, 'r', encoding='utf-8') as file:
 protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end removes empty genes (i.e. "") from the list
 
 #filter adata to only include protein coding genes
-adata = adata[:, adata.var.index.isin(protein_coding)]
+adata = adata[:, adata.var.index.isin(protein_coding)].copy()
 
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
