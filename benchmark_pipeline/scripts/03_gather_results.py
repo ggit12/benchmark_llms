@@ -62,6 +62,8 @@ def merge_obs_to_adata(adata_dict, results):
                     # Update the obs DataFrame
                     adata_dict[organ].obs = merged_obs
 
+new_label_cols = list(set(new_label_cols))
+
 # Assuming adata_dict and results are already defined and populated
 # adata_dict = merge_obs_to_adata(adata_dict, results)
 print("Merging obs columns into adata_dict", flush=True)
