@@ -140,6 +140,7 @@ for col in binary_agreement_cols_top_models:
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
+        legend=True,
     )
 
     # Write a version of the plot with the legend
@@ -148,7 +149,7 @@ for col in binary_agreement_cols_top_models:
         "",
     )
 
-    agreement_plot_temp[0].savefig(
+    agreement_plot_temp.fig.savefig(
         f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes_withlegend.svg",
         format="svg",
     )

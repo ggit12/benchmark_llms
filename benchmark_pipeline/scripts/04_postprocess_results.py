@@ -50,7 +50,7 @@ cell_type_cols = adt.get_adata_columns(adata, ends_with=['simplified_ai_cell_typ
 with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
     manual_cell_type_col = pickle.load(f)
 
-#unify category labels across all ai annotations and manual annotation.
+#unify category labels across all ai annotations and manual annotations.
 label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
 # consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
 # len(adata.obs[consistent_manual_cell_type_col].unique())
