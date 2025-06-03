@@ -479,7 +479,6 @@ rule o14_extract_DEGs:
         python scripts/14_extract_DEGs.py
         """
 
-
 rule o15_aggregate_agreement_plots_tissue:
     input:
         tables=expand("res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue.pkl", run_dir=RUN_DIRS),
