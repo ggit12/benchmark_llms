@@ -173,7 +173,6 @@ for col in binary_agreement_cols_top_models:
     )
 
     # write the plot
-
     agreement_plot_custom[0].savefig(
         f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes.svg",
         format="svg",
@@ -233,7 +232,6 @@ with open(
 
 
 # TODO: Code below here won't run unless on full object
-
 # # get adata_dict of celltypes closest to top-left (of the largest cell types)
 # adata_top_left_cells = adt.build_adata_dict(
 #     adata_large_celltypes,
