@@ -220,6 +220,7 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/direct_string_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_binary_unweighted.svg',
