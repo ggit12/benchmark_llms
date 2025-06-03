@@ -54,7 +54,7 @@ matplotlib.use('Agg')
 
 
 # Read the results
-adata = sc.read_h5ad('./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad')
+adata = sc.read_h5ad('./res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad')
 
 # And the various column names
 manual_cell_type_col = pickle.load(open('../../dat/manual_cell_type_col.pkl', 'rb'))
@@ -67,15 +67,16 @@ direct_string_agreement_cols = pickle.load(open('./res/04_postprocess_results/di
 #plot model binary agreement overall
 agreement_plot_overall_binary = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=binary_agreement_cols, granularity=0)
 
-# Get the top n models based on the overall binary agreement
+# Get the top n models based on the overall binary agreement, not including the plurality vote column
 # Extract from the plot object
 top_n = 4
+exclude_model = 'binary_agreement_consistent_including_manual_' + manual_cell_type_col + '_cell_type_by_plurality'
 xtick_labels = [tick.get_text() for tick in agreement_plot_overall_binary[1].get_xticklabels()]
 bar_heights = [bar.get_height() for bar in agreement_plot_overall_binary[1].patches]
-df = pd.DataFrame({'Model': xtick_labels, 'agreement': bar_heights}).set_index('Model')
+df = pd.DataFrame({'Model': xtick_labels, 'agreement': bar_heights}).set_index('Model').drop(exclude_model, errors='ignore')
 binary_agreement_cols_top_models = df.sort_values(by='agreement', ascending=False).head(top_n).index.tolist()
 
-# Also get the corresponding col names for the top models from perfect_only_categorical_agreement_cols, llm_celltype_cols_top_models and direct_string_agreement_cols
+# Also get the corresponding col names for the top models from categorical_agreement_cols, perfect_only_categorical_agreement_cols, direct_string_agreement_cols, and llm_celltype_cols_top_models
 categorical_agreement_cols_top_models = ['categorical_agreement_' + col.replace('binary_agreement_', '') for col in binary_agreement_cols_top_models]
 
 # This can be done by stripping the 'binary_agreement_' prefix from the model names and replacing it with 'perfect_only_categorical_agreement_'
@@ -119,7 +120,7 @@ agreement_table_overall_binary_unweighted = extract_table_from_fig(agreement_plo
 
 #plot the model categorical agreement overall (perfect only)
 agreement_plot_overall_categorical_perfect = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=perfect_only_categorical_agreement_cols, granularity=0)
-customize_figure(agreement_plot_overall_categorical_perfect, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
+customize_figure(agreement_plot_overall_categorical_perfect, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
 agreement_plot_overall_categorical_perfect[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only.svg', format='svg')
 
 agreement_table_overall_categorical_perfect = extract_table_from_fig(agreement_plot_overall_categorical_perfect, value_col_name="Perfect Match (% of Cells)")
@@ -145,8 +146,8 @@ agreement_plot_overall_categorical_perfect_unweighted = plot_model_agreement_unw
 #This is Figure 2B
 agreement_plot_overall_categorical_unweighted = plot_model_agreement_categorical_unweighted(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=categorical_agreement_cols, granularity=0)
 
-customize_figure(agreement_plot_overall_categorical_perfect_unweighted, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
-customize_figure(agreement_plot_overall_categorical_unweighted, remove_legend = True, x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (by level of agreement)', remove_bar_labels=True, fig_width=2.4, fig_height=3, new_tick_labels=model_tick_labels)
+customize_figure(agreement_plot_overall_categorical_perfect_unweighted, remove_legend = True, x_tick_substrings=['perfect_only_categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% perfect matches)', new_tick_labels=model_tick_labels)
+customize_figure(agreement_plot_overall_categorical_unweighted, remove_legend = True, x_tick_substrings=['categorical_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (by level of agreement)', remove_bar_labels=True, fig_width=2.4, fig_height=3, new_tick_labels=model_tick_labels)
 
 agreement_plot_overall_categorical_perfect_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg', format='svg')
 agreement_plot_overall_categorical_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg', format='svg')
@@ -159,8 +160,8 @@ agreement_table_categorical_unweighted = extract_table_from_fig(agreement_plot_o
 agreement_plot_overall_direct = adt.plot_model_agreement(adata, group_by=manual_cell_type_col, sub_group_by='tissue', agreement_cols=direct_string_agreement_cols, granularity=0)
 agreement_plot_overall_direct_unweighted = plot_model_agreement_unweighted(adata, group_by=manual_cell_type_col, sub_group_by='tissue', model_cols=direct_string_agreement_cols, granularity=0)
 
-customize_figure(agreement_plot_overall_direct, remove_legend = True, x_tick_substrings=['direct_string_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% exact string match)', new_tick_labels=model_tick_labels)
-customize_figure(agreement_plot_overall_direct_unweighted, remove_legend = True, x_tick_substrings=['direct_string_agreement_consistent_including_manual_' + manual_cell_type_col + '_consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% exact string match)', new_tick_labels=model_tick_labels)
+customize_figure(agreement_plot_overall_direct, remove_legend = True, x_tick_substrings=['direct_string_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% exact string match)', new_tick_labels=model_tick_labels)
+customize_figure(agreement_plot_overall_direct_unweighted, remove_legend = True, x_tick_substrings=['direct_string_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (% exact string match)', new_tick_labels=model_tick_labels)
 
 agreement_plot_overall_direct[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_direct_string.svg', format='svg')
 agreement_plot_overall_direct_unweighted[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_direct_string_unweighted.svg', format='svg')
@@ -265,6 +266,7 @@ format_as_percent = ['Overall Binary (% of Cells)', 'Overall Binary (% of Cell T
                         'Perfect Match (% of Cells)', 'Perfect Match (% of Cell Types)',
                         'Exact String Match (% of Cells)', 'Exact String Match (% of Cell Types)'
                     ]
+
 format_as_rounded = ['Kappa with Manual Annotations', 'Average Kappa with Other LLMs']
 
 for col in format_as_percent:

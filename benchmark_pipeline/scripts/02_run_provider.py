@@ -94,6 +94,7 @@ for model in model_list:
         if not isinstance(df, pd.DataFrame):
             print(f"Result for label '{label}' in {model_key} is not a pd.DataFrame.", flush=True)
             this_model_completed = False
+            continue
 
         cell_type_col = [col for col in df.columns if col.endswith('_ai_cell_type')]
         if cell_type_col and df[cell_type_col].isna().any().any():

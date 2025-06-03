@@ -38,7 +38,7 @@ print("Loaded results", flush=True)
 
 # Load the adata_dict
 print("Loading adata_dict", flush=True)
-adata_dict = adt.read_adata_dict('../../dat/preprocessed_tissue_adt_ts2')
+adata_dict = adt.read_adata_dict('../../dat/preprocessed_tissue_adt')
 print("Loaded adata_dict", flush=True)
 
 new_label_cols = []
@@ -103,5 +103,5 @@ if not all_label_cols_non_nan:
 
 #adata
 # del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
-adata.write_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
+adata.write_h5ad('./res/03_gather_results/adt_de_novo_llm_annotated.h5ad')
 print("Wrote adata", flush=True)

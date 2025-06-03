@@ -1,5 +1,5 @@
 """
-This script preprocesses the TSPv2 dataset for annotation benchmarking.
+This script preprocesses the dataset for annotation benchmarking.
 
 Runs from the root of the benchmark_pipeline directory.
 """
@@ -47,7 +47,7 @@ with open(protein_coding_path, 'r', encoding='utf-8') as file:
 protein_coding = [i[6] for i in protein_coding[1:] if i[6]] #extra if at the end removes empty genes (i.e. "") from the list
 
 #filter adata to only include protein coding genes
-adata = adata[:, adata.var.index.isin(protein_coding)]
+adata = adata[:, adata.var.index.isin(protein_coding)].copy()
 
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
@@ -94,7 +94,7 @@ print("Memory before deletion:", psutil.virtual_memory())
 gc.collect()
 print("Memory after deletion:", psutil.virtual_memory())
 
-# Optionally, you might subset the data to only high-variance genes
+# Subset the data to only high-variance genes
 adt.wrappers.set_high_variance_genes_adata_dict(adata_dict, n_top_genes=2000, subset=False, use_multithreading=False)
 print("Set high variance genes")
 print("Memory before deletion:", psutil.virtual_memory())
@@ -150,7 +150,7 @@ gc.collect()
 print("Memory after deletion:", psutil.virtual_memory())
 
 # Write the preprocessed AdataDict
-adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt_ts2")
+adt.write_adata_dict(adata_dict, "./dat/preprocessed_tissue_adt")
 print("Wrote preprocessed AdataDict")
 
 # Write the manual cell type column as pickle

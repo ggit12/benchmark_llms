@@ -41,7 +41,7 @@ llm_config['model'] = os.environ['MODEL_FOR_POST_PROCESSING']
 adt.configure_llm_backend(**llm_config)
 
 # Read the merged AnnData
-adata = sc.read_h5ad('./res/03_gather_results/ts2_de_novo_llm_annotated.h5ad')
+adata = sc.read_h5ad('./res/03_gather_results/adt_de_novo_llm_annotated.h5ad')
 
 
 #get cell type columns
@@ -64,6 +64,7 @@ unified_cell_types_with_manual = adt.get_adata_columns(adata, contains=['consist
 #calculate a cell type by majority vote of all the LLMs
 llm_celltype_cols = adt.get_adata_columns(adata, contains=['consistent_including_manual'], not_contains=[manual_cell_type_col])
 cell_type_by_plurality(adata, rater_cols=llm_celltype_cols, new_col_name='cell_type_by_plurality')
+llm_celltype_cols = llm_celltype_cols + ['cell_type_by_plurality']
 print("Calculated cell type by plurality", flush=True)
 
 #assess the agreement between the manual annotations and the ai-generated annotations
@@ -104,7 +105,7 @@ base_path = './res/04_postprocess_results/'
 
 #adata
 # del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
-adata.write_h5ad(base_path + 'ts2_de_novo_llm_annotated.h5ad')
+adata.write_h5ad(base_path + 'adt_de_novo_llm_annotated.h5ad')
 print("Wrote adata", flush=True)
 
 #label_map_with_manual
