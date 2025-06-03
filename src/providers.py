@@ -119,6 +119,9 @@ MODEL_TICK_LABELS = {
  'meta.llama3-1-8b-instruct-v1:0': 'Llama 3.1 8B Instruct',
  'mistral.mistral-large-2407-v1:0': 'Mistral Large',
  'cohere.command-r-plus-v1:0': 'Command R Plus',
+
+ # Plurality Vote Columns (not actually models, but used for plotting)
+ 'cell_type_by_plurality': 'Plurality Vote',
  }
 
 REMOVE_TICK_LABELS = {key: "" for key in MODEL_TICK_LABELS}
