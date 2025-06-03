@@ -74,7 +74,7 @@ rule o1_preprocess_data:
         directory("dat/preprocessed_tissue_adt"),
         'dat/manual_cell_type_col.pkl',
     resources: # sbatch flag to which snakemake maps
-        partition="cpu", # --partition
+        slurm_partition="cpu", # --partition
         mem="400G", # --mem
         # cpus=30, # --cpus-per-task
         runtime=240, # --time
@@ -123,7 +123,7 @@ for run_dir in RUN_DIRS:
                 expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
             resources:
-                partition="cpu",
+                slurm_partition="cpu",
                 mem_mb=400000,
                 # cpus=30,
                 runtime=480,
@@ -149,7 +149,7 @@ for run_dir in RUN_DIRS:
         output:
             f'res/{run_dir}/res/03_gather_results/adt_de_novo_llm_annotated.h5ad'
         resources:
-            partition="cpu",
+            slurm_partition="cpu",
             mem_mb=500000,
             # cpus=30,
             runtime=300,
@@ -174,9 +174,11 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl'
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             runtime=300,
             ntasks=1,
@@ -204,13 +206,16 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_perfect_only_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_categorical_unweighted.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string.svg',
+            f'res/{run_dir}/res/05_figure_2_and_table_2/agreement_plot_overall_direct_string_unweighted.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa_clustermap_overall.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/average_pairwise_kappa.svg',
             f'res/{run_dir}/res/05_figure_2_and_table_2/kappa.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/performance_table.html',
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="1200G",
             runtime=300,
             ntasks=1,
@@ -230,7 +235,8 @@ for run_dir in RUN_DIRS:
         output:
             f"res/{run_dir}/res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             runtime=60,
@@ -256,7 +262,8 @@ for run_dir in RUN_DIRS:
             f"res/{run_dir}/res/06b_figure_s3/agreement_plot_by_tissue_perfect_only.svg",
             f"res/{run_dir}/res/06b_figure_s3/agreement_table_by_tissue_perfect_only.pkl",
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             runtime=60,
@@ -294,7 +301,8 @@ for run_dir in RUN_DIRS:
             # f"res/{run_dir}/res/07_figure_3_and_s2/granulosa_module_umap_in_stromal_cells.svg",
             # f"res/{run_dir}/res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg",
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             runtime=60,
@@ -322,7 +330,8 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
             f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl',
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             time=120,
@@ -351,7 +360,8 @@ for run_dir in RUN_DIRS:
             # f'res/{run_dir}/res/09_figure_5/monocyte_module_umap_in_phagocytes.svg',
             # f'res/{run_dir}/res/09_figure_5/dendritic_module_umap_in_phagocytes.svg'
         resources:
-            partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem="400G",
             cpus=30,
             runtime=60,
@@ -371,7 +381,7 @@ rule o10_aggregate_tables:
         "res/10_aggregated_tables/aggregated_performance_table_std.pkl",
         "res/10_aggregated_tables/aggregated_performance_table.html",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -387,7 +397,7 @@ rule o11_aggregate_kappa:
         "res/11_aggregated_kappa/kappa_mean.svg",
         "res/11_aggregated_kappa/kappa_sd.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -401,7 +411,7 @@ rule o12_aggregate_agreement_plots:
         "res/12_aggregated_agreement_plots/agreement_plot_categorical.svg",
         "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1
@@ -419,7 +429,7 @@ rule o13_aggregate_agreement_plots_largest_celltypes:
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes.svg",
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -438,7 +448,8 @@ rule o14_extract_DEGs:
         "res/14_extract_DEGs/DEGs.pkl",
         "res/14_extract_DEGs/DEG_frequencies.txt",
     resources:
-        partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="400G",
         runtime=60,
         ntasks=1,
@@ -455,7 +466,7 @@ rule o15_aggregate_agreement_plots_tissue:
         "res/15_aggregated_plots_tissue/agreement_plot_by_tissue.svg",
         "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg",
     resources:
-        partition="cpu",
+        slurm_partition="cpu",
         mem="32G",
         runtime=60,
         ntasks=1,
