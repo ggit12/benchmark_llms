@@ -27,6 +27,11 @@ from src import (
 
 from src import MODEL_TICK_LABELS as model_tick_labels
 
+# Load the manual cell type column name
+manual_cell_type_col = pickle.load(
+    open("./dat/manual_cell_type_col.pkl", "rb")
+)
+
 #define a global variable to store sorted tissues for consistent ordering across plots
 sorted_tissues = None  # pylint: disable=invalid-name
 
@@ -50,10 +55,10 @@ def create_tissue_model_plot(performance_df, perfect_match=False):
     plot_df = performance_df.reset_index()
 
     # Column prefix based on perfect_match parameter
-    column_prefix = "Perfect Match (% of Cells)_perfect_only_categorical_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_" \
+    column_prefix = "Perfect Match (% of Cells)_perfect_only_categorical_agreement_consistent_including_manual_" + manual_cell_type_col + "_consistent_including_manual_" \
         if perfect_match else \
-            "Overall Binary (% of Cells)_binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_"
-    column_suffix = "_simplified_ai_cell_type"
+            "Overall Binary (% of Cells)_binary_agreement_consistent_including_manual_" + manual_cell_type_col + "_consistent_including_manual_"
+    column_suffix = "_ai_cell_type"
 
     # Get the model names from the columns
     model_columns = [col for col in performance_df.columns if col.startswith(column_prefix)]
@@ -214,7 +219,7 @@ def main():
     customize_figure(
         agreement_plot,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["agreement_" + manual_cell_type_col + "_", "_ai_cell_type"],
         fig_width=4.8,
         fig_height=3,
     )
@@ -248,7 +253,7 @@ def main():
     customize_figure(
         agreement_plot_perfect_only,
         remove_legend=True,
-        x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+        x_tick_substrings=["agreement_" + manual_cell_type_col + "_", "_ai_cell_type"],
         fig_width=4.8,
         fig_height=3,
     )
@@ -257,8 +262,6 @@ def main():
     agreement_plot_perfect_only[0].savefig(
         "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg", format="svg"
     )
-
-
 
 if __name__ == "__main__":
     main()
