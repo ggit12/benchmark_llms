@@ -226,15 +226,6 @@ for run_dir in RUN_DIRS:
             f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
         output:
-            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
-            f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
-            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
             f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done', # Done file needed
         resources:
             slurm_partition="gpu",
