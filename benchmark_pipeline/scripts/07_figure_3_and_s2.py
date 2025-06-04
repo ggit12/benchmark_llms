@@ -38,7 +38,7 @@ from src import REMOVE_TICK_LABELS as remove_tick_labels
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad")
 
 # And the various column names
 manual_cell_type_col = pickle.load(
@@ -57,7 +57,7 @@ perfect_only_categorical_agreement_cols_top_models = pickle.load(
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl", "rb")
 )
 
 # get the top 10 cell types by count
@@ -132,8 +132,6 @@ agreement_table_overall_categorical_perfect_top_celltypes.to_pickle(
 )
 
 # Figure S2
-# Initialize an empty list to store the generated plots
-agreement_plots_by_tissue_celltype_top_celltypes = []
 
 # Loop over the binary agreement columns and generate a plot for each
 for col in binary_agreement_cols_top_models:
@@ -143,14 +141,26 @@ for col in binary_agreement_cols_top_models:
         sub_group_by="tissue",
         agreement_cols=[col],  # Use the current binary agreement column
         granularity=2,
+        legend=True,
     )
+
+    # Write a version of the plot with the legend
+    model_used = col.replace(
+        "binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_",
+        "",
+    )
+
+    agreement_plot_temp.fig.savefig(
+        f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes_withlegend.svg",
+        format="svg",
+     )
 
     agreement_plot_custom = customize_clustermap(
         agreement_plot_temp,
         remove_legend=True,
         x_tick_substrings=[
             "binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_",
-            "_simplified_ai_cell_type",
+            "_ai_cell_type",
         ]
         + [
             "('" + i + "', '"
@@ -163,14 +173,7 @@ for col in binary_agreement_cols_top_models:
         new_tick_labels=remove_tick_labels,
     )
 
-    # Append the customized plot to the list
-    agreement_plots_by_tissue_celltype_top_celltypes.append(agreement_plot_custom)
-
     # write the plot
-    model_used = col.replace(
-        "binary_agreement_consistent_including_manual_cell_ontology_class_consistent_including_manual_",
-        "",
-    )
     agreement_plot_custom[0].savefig(
         f"./res/07_figure_3_and_s2/agreement_plot_tissue_celltype_{model_used}_top_celltypes.svg",
         format="svg",
@@ -217,12 +220,21 @@ agreement_scatterplot_large_celltypes[0].savefig(
 
 
 # TODO: Code below here won't run unless on full object
+# record the cell types that are closest to the top-left corner as a txt
+with open(
+    "./res/07_figure_3_and_s2/celltypes_of_interest_large_celltypes.txt",
+    "w", encoding="utf-8",
+) as f:
+    f.write(
+        "Large cell types of interest in the top left corner of the agreement plot:\n"
+    )
+    for celltype in celltypes_of_interest_large_celltypes["top_left"]:
+        f.write(f"{celltype}\n")
 
-
-# get adata_dict of celltypes in top-left
+# get adata_dict of celltypes closest to top-left (of the largest cell types)
 adata_top_left_cells = adt.build_adata_dict(
     adata_large_celltypes,
-    strata_keys=[manual_cell_type_col], #This needs to be the same as the manual col in compute_agreement_df
+    strata_keys=[manual_cell_type_col],
     desired_strata=[("basal cell",), ("stromal cell of ovary",)],
 )
 
@@ -232,7 +244,7 @@ adata_top_left_cells = adt.build_adata_dict(
 with open('./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl', 'rb') as f:
     ai_cell_type_col = pickle.load(f)[0]
 
-# Or to manually specific a specific model (included for flexibility)
+# Or to manually specify a model (included for flexibility)
 # ai_cell_type_col = 'consistent_including_manual_' + os.environ['MODEL_FOR_DETAILED_ANALYSIS'] + '_simplified_ai_cell_type'
 
 
@@ -272,29 +284,14 @@ adt.save_sankey(
     filename="./res/07_figure_3_and_s2/ai_to_manual_top_left_cells_basal_cells.svg",  # Dynamic filename for each plot
 )
 
-# Get adata for basal and stromal cells
-# make a sankey plot for Basal Cells from manual to ai_cell_type_col (best performing)
-adata_basal_cells = adt.build_adata_dict(
-    adata_large_celltypes,
-    strata_keys=[consistent_manual_cell_type_col],
-    desired_strata=[("basal cell",), ("stromal cell of ovary",)],
-)
+# Panel C
 
-# # Panel C
-# test = adt.build_adata_dict(adata_top_left_cells['Basal Cell'].copy(), strata_keys=['tissue'])
-
-# adt.neighbors_adata_dict(test, n_neighbors=15)
-
-# # Step 2: Recalculate the UMAP embedding
-# adt.calculate_umap_adata_dict(test)
-
-test = adata_top_left_cells[("basal cell",)].copy()
-sc.pp.neighbors(test, n_neighbors=15)
+adata_basal = adata_top_left_cells[("basal cell",)].copy()
+sc.pp.neighbors(adata_basal, n_neighbors=15)
 
 # Step 2: Recalculate the UMAP embedding
-sc.tl.umap(test)
+sc.tl.umap(adata_basal)
 
-# Panel C
 
 # Defining gene sets for epithelial and basal cell markers
 epithelial_genes = ["CDH1", "EPCAM", "KRT8"]  # Epithelial Cell Markers
@@ -310,9 +307,9 @@ basal_genes = ["KRT5", "KRT14", "TP63"]  # Basal Cell Markers
 
 
 # Filter gene lists to include only genes present in the dataset for 'epithelial' and 'basal' cells
-epithelial_genes_filtered = filter_gene_list(test, epithelial_genes,)
-basal_genes_filtered = filter_gene_list(test, basal_genes)
-# keratinocyte_genes_filtered = adt.filter_gene_list(keratinocyte_genes, test)
+epithelial_genes_filtered = filter_gene_list(adata_basal, epithelial_genes,)
+basal_genes_filtered = filter_gene_list(adata_basal, basal_genes)
+# keratinocyte_genes_filtered = adt.filter_gene_list(keratinocyte_genes, adata_basal)
 
 # Print filtered gene lists (optional)
 print("Epithelial genes used:", epithelial_genes_filtered)
@@ -321,22 +318,22 @@ print("Basal genes used:", basal_genes_filtered)
 
 # Calculate module scores for each gene set
 sc.tl.score_genes(
-    test, gene_list=epithelial_genes_filtered, score_name="epithelial_score"
+    adata_basal, gene_list=epithelial_genes_filtered, score_name="epithelial_score"
 )
-sc.tl.score_genes(test, gene_list=basal_genes_filtered, score_name="basal_score")
-# sc.tl.score_genes(test, gene_list=keratinocyte_genes_filtered, score_name='keratinocyte_score')
+sc.tl.score_genes(adata_basal, gene_list=basal_genes_filtered, score_name="basal_score")
+# sc.tl.score_genes(adata_basal, gene_list=keratinocyte_genes_filtered, score_name='keratinocyte_score')
 
 # Remove outliers by capping scores at a reasonable quantile (e.g., 99th percentile)
 # def remove_outliers(data, score_name):
 #     upper_limit = np.percentile(data[score_name], 99)
 #     data[score_name] = np.clip(data[score_name], None, upper_limit)
 
-# remove_outliers(test.obs, 'epithelial_score')
-# remove_outliers(test.obs, 'basal_score')
-# remove_outliers(test.obs, 'keratinocyte_score')
+# remove_outliers(adata_basal.obs, 'epithelial_score')
+# remove_outliers(adata_basal.obs, 'basal_score')
+# remove_outliers(adata_basal.obs, 'keratinocyte_score')
 
 # Create a DataFrame with the module scores
-module_scores = test.obs[["epithelial_score", "basal_score"]]
+module_scores = adata_basal.obs[["epithelial_score", "basal_score"]]
 
 # Calculate the mean module score for each gene set
 mean_scores = module_scores.mean()
@@ -354,7 +351,7 @@ plt.show()
 
 # UMAP colored by epithelial module score
 epi_fig = sc.pl.umap(
-    test,
+    adata_basal,
     color="epithelial_score",
     title="Epithelial Module Score",
     vmax=1.5,
@@ -366,7 +363,7 @@ epi_ax = epi_fig.axes[0]
 
 # UMAP colored by basal module score
 basal_fig = sc.pl.umap(
-    test,
+    adata_basal,
     color="basal_score",
     title="Basal Module Score",
     vmax=1.5,
@@ -376,7 +373,7 @@ basal_fig = sc.pl.umap(
 basal_ax = basal_fig.axes[0]
 
 # UMAP colored by basal module score
-# ker_fig = sc.pl.umap(test, color='keratinocyte_score', title='Keratinocyte Module Score', vmax=1.5, vmin=0, return_fig=True)
+# ker_fig = sc.pl.umap(adata_basal, color='keratinocyte_score', title='Keratinocyte Module Score', vmax=1.5, vmin=0, return_fig=True)
 
 customize_figure(
     (basal_module_fig, basal_module_ax),
@@ -404,12 +401,12 @@ basal_fig.savefig(
 
 # Panel E
 
-test_ov = adata_top_left_cells[("stromal cell of ovary",)].copy()
+adata_stromal_ov = adata_top_left_cells[("stromal cell of ovary",)].copy()
 
-sc.pp.neighbors(test_ov, n_neighbors=15)
+sc.pp.neighbors(adata_stromal_ov, n_neighbors=15)
 
 # Step 2: Recalculate the UMAP embedding
-sc.tl.umap(test_ov)
+sc.tl.umap(adata_stromal_ov)
 
 # Importing necessary libraries
 
@@ -419,8 +416,8 @@ stromal_genes = ["DCN", "LUM"]
 
 
 # Filter gene lists to include only genes present in the dataset for 'stromal' and 'granulosa'
-granulosa_genes_filtered = filter_gene_list(test_ov, granulosa_genes,)
-stromal_genes_filtered = filter_gene_list(test_ov, stromal_genes)
+granulosa_genes_filtered = filter_gene_list(adata_stromal_ov, granulosa_genes,)
+stromal_genes_filtered = filter_gene_list(adata_stromal_ov, stromal_genes)
 
 # Print filtered gene lists (optional)
 print("Granulosa genes used:", granulosa_genes_filtered)
@@ -428,12 +425,12 @@ print("Stromal genes used:", stromal_genes_filtered)
 
 # Calculate module scores for each gene set
 sc.tl.score_genes(
-    test_ov, gene_list=granulosa_genes_filtered, score_name="granulosa_score"
+    adata_stromal_ov, gene_list=granulosa_genes_filtered, score_name="granulosa_score"
 )
-sc.tl.score_genes(test_ov, gene_list=stromal_genes_filtered, score_name="stromal_score")
+sc.tl.score_genes(adata_stromal_ov, gene_list=stromal_genes_filtered, score_name="stromal_score")
 
 # Create a DataFrame with the module scores
-module_scores = test_ov.obs[["granulosa_score", "stromal_score"]]
+module_scores = adata_stromal_ov.obs[["granulosa_score", "stromal_score"]]
 
 # Calculate the mean module score for each gene set
 mean_scores = module_scores.mean()
@@ -451,7 +448,7 @@ plt.show()
 
 # UMAP colored by epithelial module score
 gran_fig = sc.pl.umap(
-    test_ov,
+    adata_stromal_ov,
     color="granulosa_score",
     title="Granulosa Module Score",
     vmax=1.5,
@@ -463,7 +460,7 @@ gran_ax = gran_fig.axes[0]
 
 # UMAP colored by basal module score
 stromal_fig = sc.pl.umap(
-    test_ov,
+    adata_stromal_ov,
     color="stromal_score",
     title="Stromal Module Score",
     vmax=1.5,
@@ -500,3 +497,6 @@ customize_scatterplot((stromal_fig, stromal_ax))
 stromal_fig.savefig(
     "./res/07_figure_3_and_s2/stromal_module_umap_in_stromal_cells.svg", format="svg"
 )
+
+# explicitly shut down python
+sys.exit(0)

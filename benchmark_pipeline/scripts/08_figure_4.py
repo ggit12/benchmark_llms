@@ -29,7 +29,7 @@ from src import (
 matplotlib.use('Agg')
 
 # Read the results
-adata = sc.read_h5ad("./res/04_postprocess_results/ts2_de_novo_llm_annotated.h5ad")
+adata = sc.read_h5ad("./res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad")
 
 # And the various column names
 manual_cell_type_col = pickle.load(
@@ -55,9 +55,8 @@ perfect_only_categorical_agreement_cols_top_models = pickle.load(
 )
 
 llm_celltype_cols_top_models = pickle.load(
-    open("./res/04_postprocess_results/llm_celltype_cols.pkl", "rb")
+    open("./res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl", "rb")
 )
-
 
 #compute interrater agreement across whole atlas
 agreement_df = compute_agreement_df(adata, rater_cols=llm_celltype_cols_top_models, manual_col='consistent_including_manual_' + manual_cell_type_col, agreement_type='plurality', normalize_values=False)

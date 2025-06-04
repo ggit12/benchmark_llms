@@ -67,7 +67,7 @@ agreement_plot_by_tissue = adt.plot_model_agreement(
 customize_figure(
     agreement_plot_by_tissue,
     remove_legend=True,
-    x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+    x_tick_substrings=["agreement_cell_ontology_class_", "_ai_cell_type"],
     new_ylabel="Agreement with Manual Annotation (yes/no)",
     fig_width=2.4,
     fig_height=3,
@@ -98,7 +98,7 @@ agreement_plot_by_tissue_categorical_perfect_only = adt.plot_model_agreement(
 customize_figure(
     agreement_plot_by_tissue_categorical_perfect_only,
     remove_legend=True,
-    x_tick_substrings=["agreement_cell_ontology_class_", "_simplified_ai_cell_type"],
+    x_tick_substrings=["agreement_cell_ontology_class_", "_ai_cell_type"],
     new_ylabel="Agreement with Manual Annotation (% perfect match)",
     fig_width=2.4,
     fig_height=3,
