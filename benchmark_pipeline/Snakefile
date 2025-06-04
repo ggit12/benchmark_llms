@@ -275,7 +275,8 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o5_figure_2_and_table_2_{run_dir}"
         input:
-            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad'
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
         output:
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/categorical_agreement_cols_top_models.pkl',
@@ -312,8 +313,9 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o6_figure_s1_{run_dir}"
         input:
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
             f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
-            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl'
+            f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
         output:
             f"res/{run_dir}/res/06_figure_s1/done" # Uses a done file because the specific file names may change (if the top models are different) and are not used downstream
         resources:
@@ -334,6 +336,8 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o6b_figure_s3_{run_dir}"
         input:
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
             f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
@@ -361,6 +365,7 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o7_figure_3_and_s2_{run_dir}"
         input:
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
             f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f'res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl',
             f'res/{run_dir}/res/05_figure_2_and_table_2/perfect_only_categorical_agreement_cols_top_models.pkl',
@@ -401,6 +406,7 @@ for run_dir in RUN_DIRS:
         name: f"o8_figure_4_{run_dir}"
         input:
             f'dat/manual_cell_type_col.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
             f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
             f"res/{run_dir}/res/05_figure_2_and_table_2/llm_celltype_cols_top_models.pkl",
             f"res/{run_dir}/res/05_figure_2_and_table_2/binary_agreement_cols_top_models.pkl",
@@ -429,6 +435,7 @@ for run_dir in RUN_DIRS:
     rule:
         name: f"o9_figure_5_{run_dir}"
         input:
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done',
             f"res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad",
             f'res/{run_dir}/res/08_figure_4/agreement_df.pkl',
             f'res/{run_dir}/res/08_figure_4/agreement_weights_df.pkl'
