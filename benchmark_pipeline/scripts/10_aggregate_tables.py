@@ -65,8 +65,8 @@ def main():
         "Overall Binary (% of Cell Types)",
         "Perfect Match (% of Cells)",
         "Perfect Match (% of Cell Types)",
-        'Exact String Match (% of Cells)',
-        'Exact String Match (% of Cell Types)'
+        "Exact String Match (% of Cells)",
+        "Exact String Match (% of Cell Types)"
     ]
 
     format_as_rounded = [
