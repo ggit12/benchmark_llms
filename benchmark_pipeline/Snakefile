@@ -190,6 +190,44 @@ for run_dir in RUN_DIRS:
             cd res/{params.run} && python ../../scripts/04_postprocess_results.py
             """
 
+    # Postprocess the results
+    rule:
+        name: f"o4b_model_cross_check_{run_dir}"
+        input:
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
+        output:
+            f'res/{run_dir}/res/04_postprocess_results/adt_de_novo_llm_annotated.h5ad',
+            f'res/{run_dir}/res/04_postprocess_results/label_map_with_manual.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_binary.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/label_agreement_categorical.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/llm_celltype_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/binary_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/perfect_only_categorical_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/direct_string_agreement_cols.pkl',
+            f'res/{run_dir}/res/04_postprocess_results/04b_cross_check_complete.done', # Done file needed
+        resources:
+            slurm_partition="gpu",
+            gpu=1,
+            mem="600G",
+            runtime=300,
+            ntasks=1,
+            **{f"provider_{os.environ["PROVIDER_FOR_POST_PROCESSING"]}": 1} # limit to 1 concurrent job per provider
+        params:
+            run=run_dir,
+        shell:
+            """
+            cd res/{params.run} && python ../../scripts/04_postprocess_results.py
+            """
+
     # rule:
     #     name: f"o4b_direct_string_comparison_{run_dir}"
     #     input:
