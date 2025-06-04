@@ -1,0 +1,152 @@
+"""
+Reads the output of 04, strips out the comparison columns, and reruns with the specified LLM
+"""
+# pylint: disable=line-too-long
+# pylint: disable=redefined-outer-name
+# pylint: disable=invalid-name
+
+import pickle
+import os
+import sys
+
+import anndict as adt
+import scanpy as sc
+
+from dotenv import load_dotenv
+load_dotenv()
+
+source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
+sys.path.append(os.path.join(source_dir))  # add to Python path
+
+# pylint: disable=wrong-import-position
+from src import (
+    # cell_type_by_plurality,
+    PROVIDERS,
+    # ensure_label_consistency_adata,
+    direct_compare_cell_type_labels_pairwise,
+)
+
+
+# After merging the AnnData, the labels are then processed so that various metrics can be calculated using them.
+
+# Process the labels
+#Configure the backend to work with a specific provider and model
+provider = os.environ['PROVIDER_FOR_POST_PROCESSING']
+llm_config = PROVIDERS[provider].copy()
+llm_config['model'] = os.environ['MODEL_FOR_POST_PROCESSING']
+
+adt.configure_llm_backend(**llm_config)
+
+# Read the merged AnnData and other past agreement columns
+base_path = './res/04_postprocess_results/'
+adata = sc.read_h5ad(base_path + "adt_de_novo_llm_annotated.h5ad")
+
+def load_col_list(pkl_name):
+    with open(base_path + f"{pkl_name}.pkl", "rb") as f:
+        return pickle.load(f)
+
+columns_to_remove = (
+      load_col_list("binary_agreement_cols")
+    + load_col_list("categorical_agreement_cols")
+    + load_col_list("perfect_only_categorical_agreement_cols")
+    + load_col_list("direct_string_agreement_cols")
+)
+
+# Remove the past agreement columns from adata.obs
+adata.obs.drop(columns=[c for c in columns_to_remove if c in adata.obs], inplace=True)
+
+# Proceed with the rest of the script to re-assess agreement
+
+# Read sets of column names to use for agreement assessment
+llm_celltype_cols = pickle.load(open(base_path + 'llm_celltype_cols.pkl', 'rb'))
+
+#get cell type columns
+# cell_type_cols = adt.get_adata_columns(adata, col_endswith=['ai_cell_sub_type', 'simplified_ai_cell_type'], not_col_startswith=['raw', 'agreement'])
+# cell_type_cols = adt.get_adata_columns(adata, ends_with=['simplified_ai_cell_type'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
+
+# Read manual cell type column
+with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
+    manual_cell_type_col = pickle.load(f)
+
+#unify category labels across all ai annotations and manual annotations.
+# label_map_with_manual = adt.ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+# # consistent_manual_cell_type_col = "consistent_including_manual_" + manual_cell_type_col
+# # len(adata.obs[consistent_manual_cell_type_col].unique())
+# # [print(i) for i in adata.obs[consistent_manual_cell_type_col].value_counts()]
+# # [print(i) for i in adata.obs[consistent_manual_cell_type_col].value_counts().index]
+
+# # label_map_with_manual = ensure_label_consistency_adata(adata, cell_type_cols + [manual_cell_type_col], simplification_level='unified', new_col_prefix='consistent_including_manual')
+
+# #get unified cols
+# unified_cell_types_with_manual = adt.get_adata_columns(adata, contains=['consistent_including_manual'])
+
+
+# #calculate a cell type by majority vote of all the LLMs
+# llm_celltype_cols = adt.get_adata_columns(adata, contains=['consistent_including_manual'], not_contains=[manual_cell_type_col])
+# cell_type_by_plurality(adata, rater_cols=llm_celltype_cols, new_col_name='cell_type_by_plurality')
+# llm_celltype_cols = llm_celltype_cols + ['cell_type_by_plurality']
+# print("Calculated cell type by plurality", flush=True)
+
+
+#assess the agreement between the manual annotations and the ai-generated annotations
+consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_type_col
+label_agreement_binary = adt.ai_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='binary_agreement', comparison_level='binary')
+print("Calculated binary agreement", flush=True)
+
+#get these column names
+binary_agreement_cols = adt.get_adata_columns(adata, contains = ['binary_agreement_consistent_including_manual'])
+
+#also assess at the partial agreement level
+label_agreement_categorical = adt.ai_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='categorical_agreement', comparison_level='categorical')
+print("Calculated categorical agreement", flush=True)
+
+#get these column names
+categorical_agreement_cols = adt.get_adata_columns(adata, contains = ['categorical_agreement_consistent_including_manual'])
+
+#change scale of categorical label agreement cols from 0 to 1 (raw has values 0, 1, and 2)
+adata.obs[categorical_agreement_cols] = adata.obs[categorical_agreement_cols]/2
+
+#use categorical labels to count only perfect matches, and set partial matches to 0
+perfect_only_categorical_agreement_cols = ["perfect_only_" + col for col in categorical_agreement_cols]
+adata.obs[perfect_only_categorical_agreement_cols] = adata.obs[categorical_agreement_cols].replace(0.5, 0)
+print("Calculated perfect only categorical agreement", flush=True)
+
+#assess the agreement using direct string comparison
+direct_compare_cell_type_labels_pairwise(adata, [consistent_manual_cell_type_col], llm_celltype_cols, new_col_prefix='direct_string_agreement')
+print("Calculated direct string agreement", flush=True)
+
+# get these column names
+direct_string_agreement_cols = adt.get_adata_columns(adata, contains=['direct_string_agreement_consistent_including_manual'])
+
+
+# Write out all generated objects
+base_path = './res/04_postprocess_results/'
+
+#adata_dict
+# pickle.dump(adata_dict, open(base_path + "ts2_de_novo_llm_annotated_adt", 'wb'))
+
+#adata
+# del adata.obs["adt_key"] # can't write a tuple column in obs of anndata
+adata.write_h5ad(base_path + 'adt_de_novo_llm_annotated.h5ad')
+print("Wrote adata", flush=True)
+
+#label_map_with_manual
+# pickle.dump(label_map_with_manual, open(base_path + 'label_map_with_manual.pkl', 'wb'))
+
+#label_agreement_binary
+pickle.dump(label_agreement_binary, open(base_path + 'label_agreement_binary.pkl', 'wb'))
+
+#label_agreement_categorical
+pickle.dump(label_agreement_categorical, open(base_path + 'label_agreement_categorical.pkl', 'wb'))
+
+#Write all these
+pickle.dump(llm_celltype_cols, open(base_path + 'llm_celltype_cols.pkl', 'wb'))
+pickle.dump(binary_agreement_cols, open(base_path + 'binary_agreement_cols.pkl', 'wb'))
+pickle.dump(categorical_agreement_cols, open(base_path + 'categorical_agreement_cols.pkl', 'wb'))
+pickle.dump(perfect_only_categorical_agreement_cols, open(base_path + 'perfect_only_categorical_agreement_cols.pkl', 'wb'))
+pickle.dump(direct_string_agreement_cols, open(base_path + 'direct_string_agreement_cols.pkl', 'wb'))
+print("Wrote all outputs", flush=True)
+
+# Write a done file to indicate that rule 04b has run
+with open(base_path + '04b_cross_check_complete.done', 'w', encoding='utf-8') as f:
+    f.write('04b model cross-check done\n')
