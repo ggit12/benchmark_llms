@@ -80,7 +80,11 @@ rule o1_preprocess_data:
         runtime=240, # --time
         tasks=1, # --ntasks
     shell:
-        "python scripts/01_preprocess_data.py"
+        """
+        echo "ERROR: o1_preprocess_data is disabled during cross check." >&2
+        exit 1
+        """
+        # "python scripts/01_preprocess_data.py"
 
 def make_existing_provider_pkls(run_dir, provider):
     """
@@ -104,15 +108,19 @@ for run_dir in RUN_DIRS:
                 run=run_dir,
             shell:
                 """
-                # Create cache directory
-                mkdir -p res/{params.run}/res/02_run_provider/cached_outputs/
-
-                # Move existing pkl files to cache directory (and catch error if no files exist)
-                mv res/{params.run}/res/02_run_provider/{params.provider}_*.pkl res/{params.run}/res/02_run_provider/cached_outputs/  2>/dev/null || true
-
-                # Create done marker
-                touch {output}
+                echo "ERROR: cache_previous_o2 is disabled during cross check." >&2
+                exit 1
                 """
+                # """
+                # # Create cache directory
+                # mkdir -p res/{params.run}/res/02_run_provider/cached_outputs/
+
+                # # Move existing pkl files to cache directory (and catch error if no files exist)
+                # mv res/{params.run}/res/02_run_provider/{params.provider}_*.pkl res/{params.run}/res/02_run_provider/cached_outputs/  2>/dev/null || true
+
+                # # Create done marker
+                # touch {output}
+                # """
 
         rule:
             name: f"o2_run_{provider}_{run_dir}"
@@ -134,10 +142,14 @@ for run_dir in RUN_DIRS:
                 run=run_dir,
             shell:
                 """
-                mkdir -p res/{params.run} && \
-                cd res/{params.run} && \
-                python ../../scripts/02_run_provider.py --provider {params.provider} --input ../../dat/preprocessed_tissue_adt --outdir res/02_run_provider
+                echo "ERROR: o2_run is disabled during cross check." >&2
+                exit 1
                 """
+                # """
+                # mkdir -p res/{params.run} && \
+                # cd res/{params.run} && \
+                # python ../../scripts/02_run_provider.py --provider {params.provider} --input ../../dat/preprocessed_tissue_adt --outdir res/02_run_provider
+                # """
 
     # Gather results for all providers and models
     rule:
@@ -158,8 +170,12 @@ for run_dir in RUN_DIRS:
             run=run_dir,
         shell:
             """
-            cd res/{params.run} && python ../../scripts/03_gather_results.py
+            echo "ERROR: o3_gather_results is disabled during cross check." >&2
+            exit 1
             """
+            # """
+            # cd res/{params.run} && python ../../scripts/03_gather_results.py
+            # """
 
     # Postprocess the results
     rule:
@@ -187,8 +203,12 @@ for run_dir in RUN_DIRS:
             run=run_dir,
         shell:
             """
-            cd res/{params.run} && python ../../scripts/04_postprocess_results.py
+            echo "ERROR: o4_postprocess_results is disabled during cross check." >&2
+            exit 1
             """
+            # """
+            # cd res/{params.run} && python ../../scripts/04_postprocess_results.py
+            # """
 
     # Postprocess the results
     rule:
