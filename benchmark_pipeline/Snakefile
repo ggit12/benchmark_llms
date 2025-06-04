@@ -225,7 +225,7 @@ for run_dir in RUN_DIRS:
             run=run_dir,
         shell:
             """
-            cd res/{params.run} && python ../../scripts/04_postprocess_results.py
+            cd res/{params.run} && python ../../scripts/04b_model_cross_check.py
             """
 
     # rule:
