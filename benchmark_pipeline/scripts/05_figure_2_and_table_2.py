@@ -103,7 +103,7 @@ pickle.dump(llm_celltype_cols_top_models, open('./res/05_figure_2_and_table_2/ll
 customize_figure(agreement_plot_overall_binary, remove_legend = True, x_tick_substrings=['binary_agreement_consistent_including_manual_' + manual_cell_type_col + '_', 'consistent_including_manual_', '_ai_cell_type'], new_ylabel='Agreement with Manual Annotation (yes/no)',
                  new_tick_labels=model_tick_labels)
 
- #Save the plot as an SVG file
+#Save the plot as an SVG file
 agreement_plot_overall_binary[0].savefig('./res/05_figure_2_and_table_2/agreement_plot_overall_binary.svg', format='svg')
 
 agreement_table_overall_binary = extract_table_from_fig(agreement_plot_overall_binary, value_col_name='Overall Binary (% of Cells)')
@@ -183,7 +183,7 @@ consistent_manual_cell_type_col = 'consistent_including_manual_' + manual_cell_t
 kappa_with_manual = adt.kappa_adata(adata, llm_celltype_cols + [consistent_manual_cell_type_col])
 
 # calculate alpha
-alpha = adt.krippendorff_alpha_adata(adata, llm_celltype_cols)
+# alpha = adt.krippendorff_alpha_adata(adata, llm_celltype_cols)
 
 # For kappa values
 def extract_kappa_pairs(data_dict, column_name, substring_to_remove, replace_dict):
@@ -263,8 +263,8 @@ performance_table_for_html = performance_table.copy()
 
 # Format the values in the table as percentages and/or round
 format_as_percent = ['Overall Binary (% of Cells)', 'Overall Binary (% of Cell Types)',
-                        'Perfect Match (% of Cells)', 'Perfect Match (% of Cell Types)',
-                        'Exact String Match (% of Cells)', 'Exact String Match (% of Cell Types)'
+                    'Perfect Match (% of Cells)', 'Perfect Match (% of Cell Types)',
+                    'Exact String Match (% of Cells)', 'Exact String Match (% of Cell Types)'
                     ]
 
 format_as_rounded = ['Kappa with Manual Annotations', 'Average Kappa with Other LLMs']
