@@ -36,6 +36,8 @@ rule all:
         # ------------------------------
         #to trigger o1, o2, o3, o4, o5, o8, o9
         expand("res/{run}/res/09_figure_5/confusion_matrix_for_cells_topleft_of_agreement.svg", run=RUN_DIRS),
+        #to trigger o4b
+        expand("res/{run}/res/04_postprocess_results/04b_cross_check_complete.done", run=RUN_DIRS),
         #to trigger o6
         expand("res/{run}/res/06_figure_s1/done", run=RUN_DIRS),
         #to trigger o6b
