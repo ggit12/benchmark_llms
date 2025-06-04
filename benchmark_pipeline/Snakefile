@@ -72,7 +72,8 @@ rule o1_preprocess_data:
         directory("dat/preprocessed_tissue_adt"),
         'dat/manual_cell_type_col.pkl',
     resources: # sbatch flag to which snakemake maps
-        slurm_partition="cpu", # --partition
+        slurm_partition="gpu", # --partition
+        gpu=1, # --gpus
         mem="800G", # --mem
         # cpus=30, # --cpus-per-task
         runtime=240, # --time
@@ -121,7 +122,8 @@ for run_dir in RUN_DIRS:
                 expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
             resources:
-                slurm_partition="cpu",
+                slurm_partition="gpu",
+                gpu=1,
                 mem_mb=600000,
                 # cpus=30,
                 runtime=480,
@@ -147,7 +149,8 @@ for run_dir in RUN_DIRS:
         output:
             f'res/{run_dir}/res/03_gather_results/adt_de_novo_llm_annotated.h5ad'
         resources:
-            slurm_partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem_mb=800000,
             # cpus=30,
             runtime=300,
