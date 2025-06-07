@@ -154,6 +154,10 @@ for col in binary_agreement_cols_top_models:
         format="svg",
     )
 
+
+    # Remove the tissue legend from the plot
+    agreement_plot_temp.ax_col_dendrogram.get_legend().remove()
+
     agreement_plot_custom = customize_clustermap(
         agreement_plot_temp,
         remove_legend=True,
