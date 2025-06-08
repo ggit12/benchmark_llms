@@ -41,6 +41,10 @@ conda install -c conda-forge tbb numba
 pip install -r requirements.txt
 conda install -c conda-forge firefox geckodriver
 ```
+5. (Optional) You can download a SIF file that contains all necessary libraries pre-installed instead of step 4.
+   ```bash
+   wget https://github.com/ggit12/benchmark_llms/releases/download/sif/benchmark_llms.sif
+   ```
 
 ## Pipeline Execution
 Files are numbered sequentially to indicate processing order. Input and output of each script are defined in the Snakefile.
