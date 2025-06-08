@@ -43,6 +43,12 @@ if 'raw_counts' not in adata.layers:
 #set X to be raw_counts
 adata.X = adata.layers['raw_counts'].copy()
 
+#donors from Tabula Sapiens 1 (TSP1-TSP15)
+in_ts1 = [f"TSP{i}" for i in range(1, 16)]
+
+#keep cells whose donor is not in Tabula Sapiens 1
+adata = adata[~adata.obs["donor"].isin(in_ts1), :].copy()
+
 # Take only protein coding genes
 source_dir = os.environ["SOURCE_DIR"]  # retrieve the path to src from env var
 sys.path.append(os.path.join(source_dir))  # add to Python path
@@ -62,6 +68,9 @@ if 'tissue' not in adata.obs.columns:
 
 #build adata_dict
 adata_dict = adt.build_adata_dict(adata, ['tissue'])
+
+#remove Pancreas (too few cells)
+del adata_dict[('Pancreas',)]
 
 #remove a standard list of uninformative genes
 abundant_rnas = [
