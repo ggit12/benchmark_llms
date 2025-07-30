@@ -100,12 +100,12 @@ for run_dir in RUN_DIRS:
             output:
                 temp(f"res/{run_dir}/res/02_run_provider/{provider}_cache_done")
             params:
+                slurm_partition="gpu",
+                gpu=1,
                 provider=provider,
                 run=run_dir,
                 runtime=10,
                 mem_mb=3000,
-                gpu=1,
-                slurm_partition="gpu",
             shell:
                 """
                 # Create cache directory
