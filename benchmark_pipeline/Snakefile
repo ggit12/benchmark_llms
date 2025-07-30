@@ -388,7 +388,8 @@ rule o10_aggregate_tables:
         "res/10_aggregated_tables/aggregated_performance_table_std.pkl",
         "res/10_aggregated_tables/aggregated_performance_table.html",
     resources:
-        slurm_partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="32G",
         runtime=60,
         ntasks=1,
