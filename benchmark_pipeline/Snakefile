@@ -99,13 +99,14 @@ for run_dir in RUN_DIRS:
             name: f"cache_previous_o2_{provider}_{run_dir}"
             output:
                 temp(f"res/{run_dir}/res/02_run_provider/{provider}_cache_done")
-            params:
+            resources:
                 slurm_partition="gpu",
                 gpu=1,
-                provider=provider,
-                run=run_dir,
                 runtime=10,
                 mem_mb=3000,
+            params:
+                provider=provider,
+                run=run_dir,
             shell:
                 """
                 # Create cache directory
