@@ -104,6 +104,8 @@ for run_dir in RUN_DIRS:
                 run=run_dir,
                 runtime=10,
                 mem_mb=3000,
+                gpu=1,
+                slurm_partition="gpu",
             shell:
                 """
                 # Create cache directory
