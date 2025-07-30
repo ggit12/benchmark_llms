@@ -44,7 +44,8 @@ adata = sc.read_h5ad('./res/03_gather_results/adt_de_novo_llm_annotated.h5ad')
 
 #get cell type columns
 # cell_type_cols = adt.get_adata_columns(adata, col_endswith=['ai_cell_sub_type', 'simplified_ai_cell_type'], not_col_startswith=['raw', 'agreement'])
-cell_type_cols = adt.get_adata_columns(adata, ends_with=['simplified_ai_cell_type'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
+cell_type_cols = adt.get_adata_columns(adata, contains=['simplified_'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
+print(f"Cell type columns from 04_postprocess_results: \n{cell_type_cols}", flush=True)
 
 # Read manual cell type column
 with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:

@@ -6,6 +6,16 @@ import time
 
 import anndict as adt
 
+from src.ablated_annotation_funcs import ( # pylint: disable=import-error, wrong-import-position
+    ai_cell_type_0_unablated,
+    ai_cell_type_1_base_prompt_detuned,
+    ai_cell_type_2_no_tissue_context,
+    ai_cell_type_3_no_system_prompt,
+    ai_cell_type_4_randomize_gene_list_order,
+    ai_annotate_cell_type_with_ablation,
+    simplify_obs_column_ablated,
+)
+
 
 def process_adata_dict(
     adata_dict: adt.AdataDict,
@@ -62,15 +72,60 @@ def process_adata_dict(
     #appropriate_resolution_dict = adt.ai_determine_leiden_resolution_adata_dict(adata_dict, initial_resolution=initial_resolution)
     appropriate_resolution_dict = None
 
-    #Use AI to do automatic interpretation of Differentially Expressed Genes
-    #This will be a first-draft annotation that we will subcluster, reannotate, then re-merge
-    label_results = adt.wrappers.ai_annotate_cell_type_adata_dict(adata_dict, groupby='leiden', n_top_genes=10, new_label_column=f'{model}_ai_cell_type', tissue_of_origin_col="tissue")
-    print(label_results)
-    print('ai cell type found')
+    # #Use AI to do automatic interpretation of Differentially Expressed Genes
+    # #This will be a first-draft annotation that we will subcluster, reannotate, then re-merge
+    # label_results = ai_annotate_cell_type_with_ablation(adata_dict, groupby='leiden', n_top_genes=10, new_label_column=f'{model}_ai_cell_type', tissue_of_origin_col="tissue")
+    # print(label_results)
+    # print('ai cell type found')
 
-    #These labels seem to have some redundancy, let's merge them with AI
-    simplified_mappings = adt.wrappers.simplify_obs_column_adata_dict(adata_dict, f'{model}_ai_cell_type', f'{model}_simplified_ai_cell_type', simplification_level='redundancy-removed')
-    print('simplified ai cell type found')
+    # #These labels seem to have some redundancy, let's merge them with AI
+    # simplified_mappings = adt.wrappers.simplify_obs_column_adata_dict(adata_dict, f'{model}_ai_cell_type', f'{model}_simplified_ai_cell_type', simplification_level='redundancy-removed')
+    # print('simplified ai cell type found')
+
+    # Use the LLM to annotate celltypes based on the 'leiden' column, pass tissue information from 'tissue' column.
+    # The column containing the new labels will be in adata.obs[label_column] for each adata in adata_dict
+    new_label_column = f'{model}_ai_cell_type'
+
+
+    # Prepare the ablations
+    ablations = {
+        'ablation_0_unablated': ai_cell_type_0_unablated,
+        'ablation_1_base_prompt_detuned': ai_cell_type_1_base_prompt_detuned,
+        'ablation_2_no_tissue_context': ai_cell_type_2_no_tissue_context,
+        'ablation_3_no_system_prompt': ai_cell_type_3_no_system_prompt,
+        'ablation_4_randomize_gene_list_order': ai_cell_type_4_randomize_gene_list_order
+    }
+
+    ablation_label_columns = {ablation_name:f'{new_label_column}_{ablation_name}' for ablation_name in ablations.keys()}
+    simplified_ablation_columns = {ablation_name:f'simplified_{label_column}' for ablation_name, label_column in ablation_label_columns.items()}
+
+
+    label_results = {}
+    simplified_mappings = {}
+    #Run the ablated annotation functions
+    for ablation_name, ablation_func in ablations.items():
+        label_results[ablation_name] = adata_dict.fapply(ai_annotate_cell_type_with_ablation,
+            ablated_cell_typing_func = ablation_func,
+            groupby='leiden',
+            n_top_genes=10,
+            new_label_column=ablation_label_columns[ablation_name],
+            tissue_of_origin_col="tissue")
+
+        if ablation_name == 'ablation_1_base_prompt_detuned':
+            # Standard simplification will fail due to token constraints
+            simplified_mappings[ablation_name] = adata_dict.fapply(simplify_obs_column_ablated,
+                column=ablation_label_columns[ablation_name],
+                new_column_name=simplified_ablation_columns[ablation_name],
+                simplification_level='redundancy-removed')
+        else:
+            # Can use standard simplification
+            simplified_mappings[ablation_name] = adt.wrappers.simplify_obs_column_adata_dict(adata_dict,
+                ablation_label_columns[ablation_name],
+                simplified_ablation_columns[ablation_name],
+                simplification_level='redundancy-removed')
+
+        # sleep 70 seconds to prevent API rate limiting
+        time.sleep(70)
 
     #Now get cell type labels with more granularity
     #First, subcluster within each cell type
@@ -86,7 +141,8 @@ def process_adata_dict(
     # simplified_sub_cluster_mappings = adt.simplify_obs_column_adata_dict(adata_dict, f'{model}_ai_cell_sub_type', f'{model}_simplified_ai_cell_sub_type', simplification_level='redundancy-removed, keep periods in keys')
     # print("adata_dict has had subcluster annotations simplified")
 
-    obs_dict = {key: adata.obs[[f'{model}_ai_cell_type', f'{model}_simplified_ai_cell_type']].copy() for key, adata in adata_dict.items()}
+    # obs_dict = {key: adata.obs[[f'{model}_ai_cell_type', f'{model}_simplified_ai_cell_type']].copy() for key, adata in adata_dict.items()}
+    obs_dict = {key: adata.obs[list(ablation_label_columns.values()) + list(simplified_ablation_columns.values())].copy() for key, adata in adata_dict.items()}
 
     return obs_dict, appropriate_resolution_dict, label_results, simplified_mappings#, sub_cluster_mappings#, simplified_sub_cluster_mappings
 

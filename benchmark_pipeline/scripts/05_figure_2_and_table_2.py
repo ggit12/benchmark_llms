@@ -69,7 +69,7 @@ agreement_plot_overall_binary = adt.plot_model_agreement(adata, group_by=manual_
 
 # Get the top n models based on the overall binary agreement, not including the plurality vote column
 # Extract from the plot object
-top_n = 4
+top_n = 5
 exclude_model = 'binary_agreement_consistent_including_manual_' + manual_cell_type_col + '_cell_type_by_plurality'
 xtick_labels = [tick.get_text() for tick in agreement_plot_overall_binary[1].get_xticklabels()]
 bar_heights = [bar.get_height() for bar in agreement_plot_overall_binary[1].patches]

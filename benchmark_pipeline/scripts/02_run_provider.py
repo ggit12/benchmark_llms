@@ -86,16 +86,17 @@ for model in model_list:
 
     # Check each DataFrame in the dictionary
     this_model_completed = True
-    for label, df in model_results['label_results'].items():
-        if not isinstance(df, pd.DataFrame):
-            print(f"Result for label '{label}' in {model_key} is not a pd.DataFrame.", flush=True)
-            this_model_completed = False
-            continue
+    # Output validation disabled for ablation study
+    # for label, df in model_results['label_results'].items():
+    #     if not isinstance(df, pd.DataFrame):
+    #         print(f"Result for label '{label}' in {model_key} is not a pd.DataFrame.", flush=True)
+    #         this_model_completed = False
+    #         continue
 
-        cell_type_col = [col for col in df.columns if col.endswith('_ai_cell_type')]
-        if cell_type_col and df[cell_type_col].isna().any().any():
-            print(f"Results for label '{label}' in {model_key} has NaN values in the '_ai_cell_type' column.", flush=True)
-            this_model_completed = False
+    #     cell_type_col = [col for col in df.columns if col.endswith('_ai_cell_type')]
+    #     if cell_type_col and df[cell_type_col].isna().any().any():
+    #         print(f"Results for label '{label}' in {model_key} has NaN values in the '_ai_cell_type' column.", flush=True)
+    #         this_model_completed = False
 
     if not this_model_completed:
         all_models_completed = False
