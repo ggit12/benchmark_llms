@@ -102,6 +102,8 @@ for run_dir in RUN_DIRS:
             params:
                 provider=provider,
                 run=run_dir,
+                runtime=10,
+                mem_mb=3000,
             shell:
                 """
                 # Create cache directory
@@ -123,7 +125,8 @@ for run_dir in RUN_DIRS:
                 expand("res/{run}/res/02_run_provider/{provider}_{model}.pkl", 
                        run=run_dir, provider=provider, model=ENDPOINTS.endpoints[provider])
             resources:
-                slurm_partition="cpu",
+                slurm_partition="gpu",
+                gpu=1,
                 mem_mb=400000,
                 # cpus=30,
                 runtime=480,
@@ -149,7 +152,8 @@ for run_dir in RUN_DIRS:
         output:
             f'res/{run_dir}/res/03_gather_results/adt_de_novo_llm_annotated.h5ad'
         resources:
-            slurm_partition="cpu",
+            slurm_partition="gpu",
+            gpu=1,
             mem_mb=500000,
             # cpus=30,
             runtime=300,
@@ -397,7 +401,8 @@ rule o11_aggregate_kappa:
         "res/11_aggregated_kappa/kappa_mean.svg",
         "res/11_aggregated_kappa/kappa_sd.svg",
     resources:
-        slurm_partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -411,7 +416,8 @@ rule o12_aggregate_agreement_plots:
         "res/12_aggregated_agreement_plots/agreement_plot_categorical.svg",
         "res/12_aggregated_agreement_plots/agreement_plot_categorical_unweighted.svg",
     resources:
-        slurm_partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="32G",
         runtime=60,
         ntasks=1
@@ -429,7 +435,8 @@ rule o13_aggregate_agreement_plots_largest_celltypes:
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes.svg",
         "res/13_aggregated_plots_largest_celltypes/agreement_plot_largest_celltypes_perfect_only.svg",
     resources:
-        slurm_partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="32G",
         runtime=60,
         ntasks=1,
@@ -466,7 +473,8 @@ rule o15_aggregate_agreement_plots_tissue:
         "res/15_aggregated_plots_tissue/agreement_plot_by_tissue.svg",
         "res/15_aggregated_plots_tissue/agreement_plot_by_tissue_perfect_only.svg",
     resources:
-        slurm_partition="cpu",
+        slurm_partition="gpu",
+        gpu=1,
         mem="32G",
         runtime=60,
         ntasks=1,
