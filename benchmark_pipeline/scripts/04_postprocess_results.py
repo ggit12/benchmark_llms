@@ -47,6 +47,9 @@ adata = sc.read_h5ad('./res/03_gather_results/adt_de_novo_llm_annotated.h5ad')
 cell_type_cols = adt.get_adata_columns(adata, contains=['simplified_'], not_starts_with=['raw', 'agreement'], not_contains=['consistent'])
 print(f"Cell type columns from 04_postprocess_results: \n{cell_type_cols}", flush=True)
 
+# Have to remove ablation 1 from rest of pipeline because the labels are too long to process and thus the pipeline fails
+cell_type_cols.remove('simplified_claude-3-5-sonnet-20240620_ai_cell_type_ablation_1_base_prompt_detuned')
+
 # Read manual cell type column
 with open("../../dat/manual_cell_type_col.pkl", 'rb') as f:
     manual_cell_type_col = pickle.load(f)
