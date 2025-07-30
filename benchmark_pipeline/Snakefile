@@ -310,8 +310,8 @@ for run_dir in RUN_DIRS:
         resources:
             slurm_partition="gpu",
             gpu=1,
-            mem="400G",
-            cpus=30,
+            mem="600G",
+            # cpus=30,
             runtime=60,
             ntasks=1,
         params:
